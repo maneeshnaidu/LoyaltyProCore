@@ -1,0 +1,6 @@
+@LoyaltyProCore_HostAddress = http://localhost:5082
+
+GET {{LoyaltyProCore_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
