@@ -17,21 +17,6 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Add Identity services
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDBContext>()
-    .AddDefaultTokenProviders();
-
-// Configure Identity options (optional but recommended)
-builder.Services.Configure<IdentityOptions>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-});
-
 builder.Services.AddControllers();
 
 var app = builder.Build();

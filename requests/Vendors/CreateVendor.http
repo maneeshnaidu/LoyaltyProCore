@@ -1,9 +1,0 @@
-
-POST {{host}}/vendors
-Authorization: Bearer {{token}}
-Content-Type: "application/json"
-
-{
-    "Name": "Kreem Cafe",
-    "Description": "Premium Cafe"
-}
