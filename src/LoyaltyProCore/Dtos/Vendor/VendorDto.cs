@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LoyaltyProCore.Models
+using LoyaltyProCore.Dtos.Outlet;
+using LoyaltyProCore.Models;
+
+namespace LoyaltyProCore.Dtos
 {
-    public class Vendor
+    public class VendorDto
     {
         public int Id { get; set; }
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
-        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
-        public List<Outlet> Outlets { get; set; } = new List<Outlet>();
+        public required DateTime CreatedOn { get; set; }
+        public List<OutletDto>? Outlets { get; set; }
     }
 }
