@@ -10,7 +10,7 @@ namespace LoyaltyProCore.Models
         public int Id { get; set; }
         public int VendorId { get; set; }
         public required string Location { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
         // Navigation Property
         public Vendor? Vendor { get; set; }
     }

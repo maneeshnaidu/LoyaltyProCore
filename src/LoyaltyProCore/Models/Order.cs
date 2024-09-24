@@ -15,6 +15,6 @@ namespace LoyaltyProCore.Models
         public decimal Amount { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal PointsEarned { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
     }
 }

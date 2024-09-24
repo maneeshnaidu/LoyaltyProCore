@@ -14,6 +14,6 @@ namespace LoyaltyProCore.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal PointsRequired { get; set; }
         public string Description { get; set; } = string.Empty;
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
     }
 }

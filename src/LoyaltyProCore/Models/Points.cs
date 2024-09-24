@@ -15,6 +15,6 @@ namespace LoyaltyProCore.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Point { get; set; }
         public int Level { get; set; }
-        public DateTime LastUpdatedOn { get; set; }
+        public DateTime LastUpdatedOn { get; set; } = DateTime.Now;
     }
 }

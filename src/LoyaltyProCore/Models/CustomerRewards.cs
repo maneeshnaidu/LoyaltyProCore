@@ -10,6 +10,6 @@ namespace LoyaltyProCore.Models
         public int Id { get; set; }
         public int? CustomerId { get; set; }
         public int? RewardId { get; set; }
-        public DateTime RedeemedOn { get; set; }
+        public DateTime RedeemedOn { get; set; } = DateTime.Now;
     }
 }
