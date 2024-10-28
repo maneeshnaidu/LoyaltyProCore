@@ -9,8 +9,8 @@ namespace LoyaltyProCore.Models
     public class Order
     {
         public int Id { get; set; }
-        public int? CustomerId { get; set; }
-        public int? OutletId { get; set; }
+        public required string CustomerId { get; set; }
+        public int OutletId { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
         [Column(TypeName = "decimal(18,2)")]

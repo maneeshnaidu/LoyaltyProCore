@@ -9,7 +9,7 @@ namespace LoyaltyProCore.Models
     public class Points
     {
         public int Id { get; set; }
-        public int CustomerId { get; set; }
+        public required string CustomerId { get; set; }
         public int VendorId { get; set; }
         public int? OutletId { get; set; }
         [Column(TypeName = "decimal(18,2)")]

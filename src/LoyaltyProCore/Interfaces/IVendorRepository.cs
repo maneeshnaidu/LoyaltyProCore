@@ -16,5 +16,6 @@ namespace LoyaltyProCore.Interfaces
         Task<Vendor> CreateAsync(Vendor vendorModel);
         Task<Vendor?> UpdateAsync(int id, UpdateVendorRequestDto vendorRequestDto);
         Task<Vendor?> DeleteAsync(int id);
+        Task<bool> VendorExists(int id);
     }
 }

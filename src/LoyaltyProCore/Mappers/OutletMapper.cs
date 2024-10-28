@@ -20,5 +20,14 @@ namespace LoyaltyProCore.Mappers
                 CreatedOn = outletModel.CreatedOn
             };
         }
+
+        public static Outlet ToOutletFromCreateDto(this CreateOutletDto outletDto)
+        {
+            return new Outlet
+            {
+                VendorId = outletDto.VendorId,
+                Location = outletDto.Location
+            };
+        }
     }
 }

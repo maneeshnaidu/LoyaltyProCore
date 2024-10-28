@@ -18,6 +18,7 @@ namespace LoyaltyProCore.Mappers
                 Id = vendorModel.Id,
                 Name = vendorModel.Name,
                 Description = vendorModel.Description,
+                Category = vendorModel.Category,
                 CreatedOn = vendorModel.CreatedOn,
                 Outlets = vendorModel.Outlets.Select(o => o.ToOutletDto()).ToList()
             };
@@ -28,7 +29,8 @@ namespace LoyaltyProCore.Mappers
             return new Vendor
             {
                 Name = vendorRequestDto.Name,
-                Description = vendorRequestDto.Description
+                Description = vendorRequestDto.Description,
+                Category = vendorRequestDto.Category
             };
         }
 

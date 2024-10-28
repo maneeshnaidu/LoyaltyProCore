@@ -8,6 +8,7 @@ namespace LoyaltyProCore.Helpers
     public class QueryObject
     {
         public string? Category { get; set; } = null;
+        public string? Location { get; set;}
         public string? CompanyName { get; set; } = null;
         public string? SortBy { get; set; } = null;
         public bool IsDecsending { get; set; } = false;

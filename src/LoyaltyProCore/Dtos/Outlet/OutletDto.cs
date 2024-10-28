@@ -7,9 +7,9 @@ namespace LoyaltyProCore.Dtos.Outlet
 {
     public class OutletDto
     {
-        public int Id { get; set; }
-        public int VendorId { get; set; }
+        public int Id { get; set; }        
         public required string Location { get; set; }
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime CreatedOn { get; set; } 
+        public int? VendorId { get; set; }
     }
 }
