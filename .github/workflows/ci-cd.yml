@@ -20,13 +20,16 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Install dependencies
-        run: dotnet restore src/LoyaltyProCore
+        run: dotnet restore ./src/LoyaltyProCore
 
       - name: Build
-        run: dotnet build src/LoyaltyProCore --no-restore
+        run: dotnet build ./src/LoyaltyProCore --no-restore
 
       - name: Run tests
-        run: dotnet test src/LoyaltyProCore --no-build --verbosity normal
+        run: dotnet test ./src/LoyaltyProCore --no-build --verbosity normal
+
+      - name: Publish the project
+        run: dotnet publish ./src/LoyaltyProCore.csproj --configuration Release --output ./output  
 
       - name: Login to Azure
         uses: azure/login@v1
@@ -38,4 +41,4 @@ jobs:
         with:
           app-name: 'loyaltyprocore'
           slot-name: 'production'
-          package: src/LoyaltyProCore
+          package: ./output # Path to the output folder
