@@ -42,4 +42,5 @@ jobs:
         with:
           app-name: 'loyaltyprocore'
           slot-name: 'production'
-          package: src/LoyaltyProCore/publish
+        #   package: src/LoyaltyProCore/publish
+          package: ./publish
