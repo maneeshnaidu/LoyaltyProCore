@@ -57,7 +57,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 12;
 })
-.AddEntityFrameworkStores<ApplicationDBContext>();
+.AddEntityFrameworkStores<ApplicationDBContext>()
+.AddDefaultTokenProviders();
 
 // Add Authentication Service & Schemes
 builder.Services.AddAuthentication(options =>
@@ -89,6 +90,15 @@ builder.Services.AddScoped<IOutletRepository, OutletRepository>();
 
 builder.Services.AddControllers();
 
+// Add Authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireSuperAdminRole", policy => policy.RequireRole("SuperAdmin"));
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("RequireStaffRole", policy => policy.RequireRole("Staff"));
+    options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -99,6 +109,14 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging() || app.Enviro
     app.MapControllers();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+    await SeedRolesAndAdmin(roleManager, userManager);
+}
 
 app.UseHttpsRedirection();
 
@@ -107,5 +125,32 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.Run();
+
+// Seed Default Roles and Admin User
+async Task SeedRolesAndAdmin(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+{
+    string adminEmail = "superadmin@example.com";
+    string adminPassword = "Admin@123456";
+
+    if (!await roleManager.RoleExistsAsync("SuperAdmin"))
+        await roleManager.CreateAsync(new IdentityRole("SuperAdmin"));
+
+    if (!await roleManager.RoleExistsAsync("Admin"))
+        await roleManager.CreateAsync(new IdentityRole("Admin"));
+
+    if (!await roleManager.RoleExistsAsync("Staff"))
+        await roleManager.CreateAsync(new IdentityRole("Staff"));
+
+    if (!await roleManager.RoleExistsAsync("User"))
+        await roleManager.CreateAsync(new IdentityRole("User"));
+
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser == null)
+    {
+        adminUser = new ApplicationUser { UserName = adminEmail, Email = adminEmail, FirstName = "Super", LastName = "Admin" };
+        await userManager.CreateAsync(adminUser, adminPassword);
+        await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
+    }
+}
 
 

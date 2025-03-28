@@ -19,6 +19,7 @@ namespace LoyaltyProCore.Data
         }
 
         public DbSet<CustomerRewards> CustomerRewards { get; set; }
+        public DbSet<Device> Devices { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Outlet> Outlets { get; set; }
         public DbSet<Points> Points { get; set; }
