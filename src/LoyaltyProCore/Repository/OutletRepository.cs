@@ -46,16 +46,16 @@ namespace LoyaltyProCore.Repository
         {
             var outlets = _context.Outlets.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(query.Location))
+            if (!string.IsNullOrWhiteSpace(query.Address))
             {
-                outlets = outlets.Where(x => x.Location.Contains(query.Location));
+                outlets = outlets.Where(x => x.Address.Contains(query.Address));
             }
 
             if (!string.IsNullOrWhiteSpace(query.SortBy))
             {
-                if (query.SortBy.Equals("Location", StringComparison.OrdinalIgnoreCase))
+                if (query.SortBy.Equals("Address", StringComparison.OrdinalIgnoreCase))
                 {
-                    outlets = query.IsDecsending ? outlets.OrderByDescending(o => o.Location) : outlets.OrderBy(o => o.Location);
+                    outlets = query.IsDecsending ? outlets.OrderByDescending(o => o.Address) : outlets.OrderBy(o => o.Address);
                 }
             }
 
@@ -89,12 +89,12 @@ namespace LoyaltyProCore.Repository
                 return null;
             }
 
-            existingOutlet.Location = outletDto.Location;
+            existingOutlet.Address = outletDto.Address;
 
             await _context.SaveChangesAsync();
 
             return existingOutlet;
         }
-        
+
     }
 }

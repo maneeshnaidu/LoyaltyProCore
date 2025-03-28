@@ -9,6 +9,7 @@ namespace LoyaltyProCore.Dtos.Outlet
     public class UpdateOutletDto
     {
         [Required]
-        public string Location { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
     }
 }

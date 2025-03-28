@@ -33,7 +33,7 @@ namespace LoyaltyProCore.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.Username.ToLower());
 
             if (user == null) return Unauthorized("Invalid username!");
 
@@ -44,6 +44,8 @@ namespace LoyaltyProCore.Controllers
             return Ok(
                 new NewUserDto
                 {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
                     UserName = user.UserName,
                     Email = user.Email,
                     Token = _tokenService.CreateToken(user)
@@ -61,6 +63,8 @@ namespace LoyaltyProCore.Controllers
 
                 var appUser = new ApplicationUser
                 {
+                    FirstName = registerDto.FirstName,
+                    LastName = registerDto.LastName,
                     UserName = registerDto.Username,
                     Email = registerDto.Email
                 };
@@ -75,6 +79,8 @@ namespace LoyaltyProCore.Controllers
                         return Ok(
                             new NewUserDto
                             {
+                                FirstName = appUser.FirstName,
+                                LastName = appUser.LastName,
                                 UserName = appUser.UserName,
                                 Email = appUser.Email,
                                 Token = _tokenService.CreateToken(appUser)

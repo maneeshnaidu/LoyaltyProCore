@@ -19,6 +19,9 @@ namespace LoyaltyProCore.Mappers
                 Name = vendorModel.Name,
                 Description = vendorModel.Description,
                 Category = vendorModel.Category,
+                CoverImageUrl = vendorModel.CoverImageUrl,
+                LogoImageUrl = vendorModel.LogoImageUrl,
+                IsActive = vendorModel.IsActive,
                 CreatedOn = vendorModel.CreatedOn,
                 Outlets = vendorModel.Outlets.Select(o => o.ToOutletDto()).ToList()
             };
@@ -30,7 +33,10 @@ namespace LoyaltyProCore.Mappers
             {
                 Name = vendorRequestDto.Name,
                 Description = vendorRequestDto.Description,
-                Category = vendorRequestDto.Category
+                Category = vendorRequestDto.Category,
+                CoverImageUrl = vendorRequestDto.CoverImageUrl,
+                LogoImageUrl = vendorRequestDto.LogoImageUrl,
+                IsActive = vendorRequestDto.IsActive
             };
         }
 

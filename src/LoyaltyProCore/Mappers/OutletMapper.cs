@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using LoyaltyProCore.Dtos.Outlet;
 using LoyaltyProCore.Models;
 
@@ -15,9 +10,9 @@ namespace LoyaltyProCore.Mappers
             return new OutletDto
             {
                 Id = outletModel.Id,
-                Location = outletModel.Location,
+                Address = outletModel.Address,
                 VendorId = outletModel.VendorId,
-                CreatedOn = outletModel.CreatedOn
+                IsActive = outletModel.IsActive
             };
         }
 
@@ -26,7 +21,8 @@ namespace LoyaltyProCore.Mappers
             return new Outlet
             {
                 VendorId = outletDto.VendorId,
-                Location = outletDto.Location
+                Address = outletDto.Address,
+                IsActive = outletDto.IsActive
             };
         }
     }

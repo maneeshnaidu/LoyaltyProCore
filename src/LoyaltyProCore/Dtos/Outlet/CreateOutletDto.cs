@@ -9,6 +9,7 @@ namespace LoyaltyProCore.Dtos.Outlet
     public class CreateOutletDto
     {
         public int VendorId { get; set; }
-        public required string Location { get; set; }   
+        public required string Address { get; set; }
+        public bool IsActive { get; set; }
     }
 }

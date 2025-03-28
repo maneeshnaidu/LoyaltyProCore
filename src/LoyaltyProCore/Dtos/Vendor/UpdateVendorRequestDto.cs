@@ -19,5 +19,8 @@ namespace LoyaltyProCore.Dtos.Vendor
         [Required]
         [MaxLength(10, ErrorMessage = "Category cannot be over 10 over characters")]
         public string Category { get; set; } = string.Empty;
+        public string CoverImageUrl { get; set; } = string.Empty;
+        public string LogoImageUrl { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
     }
 }
