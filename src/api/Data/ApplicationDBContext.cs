@@ -1,4 +1,5 @@
 using api.Models;
+
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,7 @@ namespace api.Data
         public DbSet<PointsTransaction> PointsTransactions { get; set; }
         public DbSet<Reward> Rewards { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
+        public DbSet<VendorIntegration> VendorIntegrations { get; set; }
 
     }
 }

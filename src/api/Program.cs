@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,8 +85,15 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Add Repositories
-builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<IOutletRepository, OutletRepository>();
+builder.Services.AddScoped<IPointsRepository, PointsRepository>();
+builder.Services.AddScoped<IRewardRepository, RewardRepository>();
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
+
+// Add Services
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddControllers();
 
@@ -126,7 +134,7 @@ app.UseAuthorization();
 app.Run();
 
 // Seed Default Roles and Admin User
-async Task SeedRolesAndAdmin(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+static async Task SeedRolesAndAdmin(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
 {
     string adminEmail = "superadmin@example.com";
     string adminPassword = "Admin@123456";

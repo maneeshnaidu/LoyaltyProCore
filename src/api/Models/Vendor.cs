@@ -14,7 +14,8 @@ namespace api.Models
         public bool IsActive { get; set; }
         public string CoverImageUrl { get; set; } = string.Empty;
         public string LogoImageUrl { get; set; } = string.Empty;
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedOn { get; set; }
         public List<Outlet> Outlets { get; set; } = new List<Outlet>();
         public List<Reward> RewardPrograms { get; set; } = new List<Reward>();
     }

@@ -15,6 +15,6 @@ namespace api.Models
         public decimal Points { get; set; }
         public required string TransactionType { get; set; }
         public int? OutletId { get; set; }
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     }
 }

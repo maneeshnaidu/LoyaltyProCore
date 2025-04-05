@@ -13,7 +13,7 @@ namespace api.Models
         public string DeviceToken { get; set; } = string.Empty;
         public int VendorId { get; set; }
         public bool IsActive { get; set; }
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public Vendor? Vendor { get; set; }
     }
 }

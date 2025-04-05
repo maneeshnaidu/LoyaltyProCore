@@ -65,9 +65,9 @@ namespace api.Repository
             return await _context.Vendors.Include(o => o.Outlets).FirstOrDefaultAsync(i => i.Id == id);
         }
 
-        public Task<bool> VendorExists(int id)
+        public async Task<bool> VendorExists(int id)
         {
-            return _context.Vendors.AnyAsync(v => v.Id == id);
+            return await _context.Vendors.AnyAsync(v => v.Id == id);
         }
 
         public async Task<Vendor?> UpdateAsync(int id, UpdateVendorRequestDto vendorDto)

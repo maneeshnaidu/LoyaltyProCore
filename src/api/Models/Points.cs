@@ -17,7 +17,7 @@ namespace api.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Point { get; set; }
         public int Level { get; set; }
-        public DateTime LastUpdatedOn { get; set; } = DateTime.Now;
+        public DateTime LastUpdatedOn { get; set; } = DateTime.UtcNow;
         public Vendor? Vendor { get; set; } // Navigation property
         public Outlet? Outlet { get; set; } // Navigation property
         public ApplicationUser? Customer { get; set; } // Navigation property

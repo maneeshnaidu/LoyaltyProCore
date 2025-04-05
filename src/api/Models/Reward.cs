@@ -16,7 +16,7 @@ namespace api.Models
         public decimal PointsRequired { get; set; }
         public string Description { get; set; } = string.Empty;
         public bool IsActive { get; set; }
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public Vendor? Vendor { get; set; }
     }
 }
