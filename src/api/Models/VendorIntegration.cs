@@ -23,6 +23,7 @@ namespace api.Models
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedOn { get; set; }
         public Vendor? Vendor { get; set; }
     }
 }

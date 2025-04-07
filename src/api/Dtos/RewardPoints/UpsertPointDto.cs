@@ -1,11 +1,11 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api.Dtos.Points
+namespace api.Dtos.RewardPoints
 {
-    public class PointsDto
+    public class UpsertPointsDto
     {
-        public int Id { get; set; }
         public string CustomerId { get; set; } = string.Empty;
+        public int RewardId { get; set; }
         public int VendorId { get; set; }
         public int? OutletId { get; set; }
         [Column(TypeName = "decimal(18,2)")]

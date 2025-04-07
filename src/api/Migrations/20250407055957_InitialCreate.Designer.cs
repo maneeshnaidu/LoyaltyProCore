@@ -12,8 +12,8 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250405063254_IntegrationsUpdate")]
-    partial class IntegrationsUpdate
+    [Migration("20250407055957_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -215,6 +215,9 @@ namespace api.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("UserCode")
+                        .HasColumnType("integer");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -229,6 +232,9 @@ namespace api.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.HasIndex("OutletId");
+
+                    b.HasIndex("UserCode")
+                        .IsUnique();
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -391,44 +397,6 @@ namespace api.Migrations
                     b.ToTable("Outlets");
                 });
 
-            modelBuilder.Entity("api.Models.Points", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LastUpdatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Level")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("OutletId")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Point")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("VendorId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("OutletId");
-
-                    b.HasIndex("VendorId");
-
-                    b.ToTable("Points");
-                });
-
             modelBuilder.Entity("api.Models.PointsTransaction", b =>
                 {
                     b.Property<int>("Id")
@@ -495,6 +463,49 @@ namespace api.Migrations
                     b.HasIndex("VendorId");
 
                     b.ToTable("Rewards");
+                });
+
+            modelBuilder.Entity("api.Models.RewardPoints", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastUpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("OutletId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Point")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RewardId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VendorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OutletId");
+
+                    b.HasIndex("RewardId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("RewardPoints");
                 });
 
             modelBuilder.Entity("api.Models.Vendor", b =>
@@ -596,6 +607,9 @@ namespace api.Migrations
 
                     b.Property<string>("OAuthTokenUrl")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("VendorId")
                         .HasColumnType("integer");
@@ -710,7 +724,18 @@ namespace api.Migrations
                     b.Navigation("Vendor");
                 });
 
-            modelBuilder.Entity("api.Models.Points", b =>
+            modelBuilder.Entity("api.Models.Reward", b =>
+                {
+                    b.HasOne("api.Models.Vendor", "Vendor")
+                        .WithMany("RewardPrograms")
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("api.Models.RewardPoints", b =>
                 {
                     b.HasOne("api.Models.ApplicationUser", "Customer")
                         .WithMany("StampCard")
@@ -722,6 +747,12 @@ namespace api.Migrations
                         .WithMany()
                         .HasForeignKey("OutletId");
 
+                    b.HasOne("api.Models.Reward", "Reward")
+                        .WithMany()
+                        .HasForeignKey("RewardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("api.Models.Vendor", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId")
@@ -732,16 +763,7 @@ namespace api.Migrations
 
                     b.Navigation("Outlet");
 
-                    b.Navigation("Vendor");
-                });
-
-            modelBuilder.Entity("api.Models.Reward", b =>
-                {
-                    b.HasOne("api.Models.Vendor", "Vendor")
-                        .WithMany("RewardPrograms")
-                        .HasForeignKey("VendorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Reward");
 
                     b.Navigation("Vendor");
                 });

@@ -8,10 +8,11 @@ using api.Models;
 
 namespace api.Models
 {
-    public class Points
+    public class RewardPoints
     {
         public int Id { get; set; }
         public string CustomerId { get; set; } = string.Empty;
+        public int RewardId { get; set; }
         public int VendorId { get; set; }
         public int? OutletId { get; set; }
         [Column(TypeName = "decimal(18,2)")]
@@ -19,6 +20,7 @@ namespace api.Models
         public int Level { get; set; }
         public DateTime LastUpdatedOn { get; set; } = DateTime.UtcNow;
         public Vendor? Vendor { get; set; } // Navigation property
+        public Reward? Reward { get; set; } // Navigation property
         public Outlet? Outlet { get; set; } // Navigation property
         public ApplicationUser? Customer { get; set; } // Navigation property
     }

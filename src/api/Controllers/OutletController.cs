@@ -12,14 +12,12 @@ namespace api.Controllers
     [Route("api/outlet")]
     public class OutletController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
         private readonly IOutletRepository _outletRepository;
         private readonly IVendorRepository _vendorRepository;
         public OutletController(ApplicationDBContext context, IOutletRepository outletRepository, IVendorRepository vendorRepository)
         {
             _outletRepository = outletRepository;
             _vendorRepository = vendorRepository;
-            _context = context;
         }
 
         [HttpGet]

@@ -86,14 +86,16 @@ builder.Services.AddAuthentication(options =>
 
 // Add Repositories
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
 builder.Services.AddScoped<IOutletRepository, OutletRepository>();
 builder.Services.AddScoped<IPointsRepository, PointsRepository>();
 builder.Services.AddScoped<IRewardRepository, RewardRepository>();
+builder.Services.AddScoped<ITransactionsRepository, TransactionRepository>();
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
-builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
 
 // Add Services
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();
 

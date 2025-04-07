@@ -1,6 +1,7 @@
 using api.Dtos.Account;
 using api.Interfaces;
 using api.Models;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,16 @@ namespace api.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly SignInManager<ApplicationUser> _signinManager;
-        public AccountController(UserManager<ApplicationUser> userManager, ITokenService tokenService, SignInManager<ApplicationUser> signInManager)
+        private readonly IUserService _userService;
+        public AccountController(UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        IUserService userService,
+        ITokenService tokenService)
         {
             _userManager = userManager;
-            _tokenService = tokenService;
             _signinManager = signInManager;
+            _userService = userService;
+            _tokenService = tokenService;
         }
 
         [HttpPost("login")]
@@ -57,6 +63,7 @@ namespace api.Controllers
 
                 var appUser = new ApplicationUser
                 {
+                    UserCode = await _userService.GenerateUserCodeAsync(),
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
                     UserName = registerDto.Username,

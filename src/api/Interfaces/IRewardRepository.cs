@@ -12,5 +12,7 @@ namespace api.Interfaces
         Task<Reward?> UpdateAsync(int id, UpdateRewardDto RewardDto);
         Task<Reward?> DeleteAsync(int id);
         Task<bool> RewardExists(int id);
+        Task<CustomerRewards> AddRewardAsync(RewardPoints model);
+        Task<CustomerRewards?> RedeemRewardAsync(int rewardId, int customerCode);
     }
 }

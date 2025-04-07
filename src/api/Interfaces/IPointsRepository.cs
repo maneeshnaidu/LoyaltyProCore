@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using api.Dtos.Points;
+using api.Dtos.RewardPoints;
 using api.Helpers;
 using api.Models;
 
@@ -11,12 +11,14 @@ namespace api.Interfaces
 {
     public interface IPointsRepository
     {
-        Task<List<Points>> GetAllAsync(QueryObject query);
-        Task<Points?> GetByIdAsync(int id);
-        Task<List<Points>> GetByCustomerIdAsync(string customerId);
-        Task<Points> CreateAsync(Points pointsModel);
-        Task<Points?> UpdateAsync(int id, UpsertPointsDto pointsDto);
-        Task<Points?> DeleteAsync(int id);
+        Task<List<RewardPoints>> GetAllAsync(QueryObject query);
+        Task<RewardPoints?> GetByIdAsync(int id);
+        Task<List<RewardPoints>> GetUserPoints(ApplicationUser user);
+        Task<RewardPoints?> GetUserPointsByVendor(string customerId, int vendorId);
+        Task<RewardPoints?> GetUserPointsByReward(string customerId, int rewardId);
+        Task<RewardPoints> CreateAsync(RewardPoints pointsModel);
+        Task<RewardPoints?> UpdateAsync(int id, UpsertPointsDto pointsDto);
+        Task<RewardPoints?> DeleteAsync(int id);
         Task<bool> PointsExists(int id);
     }
 }

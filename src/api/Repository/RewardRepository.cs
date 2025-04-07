@@ -11,9 +11,11 @@ namespace api.Repository
     public class RewardRepository : IRewardRepository
     {
         private readonly ApplicationDBContext _context;
-        public RewardRepository(ApplicationDBContext context)
+        private readonly IUserService _userService;
+        public RewardRepository(ApplicationDBContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         public async Task<Reward> CreateAsync(Reward model)
@@ -85,6 +87,46 @@ namespace api.Repository
         public async Task<bool> RewardExists(int id)
         {
             return await _context.Rewards.AnyAsync(x => x.Id == id);
+        }
+
+        public async Task<CustomerRewards> AddRewardAsync(RewardPoints model)
+        {
+            var reward = new CustomerRewards
+            {
+                CustomerId = model.CustomerId,
+                RewardId = model.RewardId,
+                VendorId = model.VendorId,
+                OutletId = model.OutletId,
+                CreatedOn = DateTime.UtcNow
+            };
+
+            await _context.CustomerRewards.AddAsync(reward);
+            await _context.SaveChangesAsync();
+            return reward;
+        }
+
+        public async Task<CustomerRewards?> RedeemRewardAsync(int rewardId, int customerCode)
+        {
+            var user = await _userService.GetUserByUserCodeAsync(customerCode);
+            if (user != null)
+            {
+                var model = await _context.CustomerRewards.FirstOrDefaultAsync(x => x.Id == rewardId
+                && x.CustomerId == user.Id);
+
+                if (model == null)
+                {
+                    return null;
+                }
+
+                _context.CustomerRewards.Remove(model);
+                await _context.SaveChangesAsync();
+                return model;
+            }
+            else
+            {
+                return null;
+            }
+
         }
     }
 }

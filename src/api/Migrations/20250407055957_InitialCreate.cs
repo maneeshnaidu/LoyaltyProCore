@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace api.Migrations
 {
     /// <inheritdoc />
-    public partial class VendorUpdate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,7 +34,12 @@ namespace api.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CustomerId = table.Column<string>(type: "text", nullable: false),
                     RewardId = table.Column<int>(type: "integer", nullable: false),
-                    RedeemedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    VendorId = table.Column<int>(type: "integer", nullable: false),
+                    OutletId = table.Column<int>(type: "integer", nullable: true),
+                    ExternalId = table.Column<string>(type: "text", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RedeemedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -132,6 +137,7 @@ namespace api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    UserCode = table.Column<int>(type: "integer", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: true),
                     OutletId = table.Column<int>(type: "integer", nullable: true),
@@ -188,6 +194,7 @@ namespace api.Migrations
                     CoverImageUrl = table.Column<string>(type: "text", nullable: false),
                     LogoImageUrl = table.Column<string>(type: "text", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ApplicationUserId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -233,7 +240,11 @@ namespace api.Migrations
                     VendorId = table.Column<int>(type: "integer", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Latitude = table.Column<string>(type: "text", nullable: true),
+                    Longitude = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -264,6 +275,39 @@ namespace api.Migrations
                     table.PrimaryKey("PK_Rewards", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Rewards_Vendors_VendorId",
+                        column: x => x.VendorId,
+                        principalTable: "Vendors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VendorIntegrations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Category = table.Column<string>(type: "text", nullable: false),
+                    VendorId = table.Column<int>(type: "integer", nullable: false),
+                    IntegrationType = table.Column<string>(type: "text", nullable: false),
+                    AuthMethod = table.Column<string>(type: "text", nullable: false),
+                    ApiUrl = table.Column<string>(type: "text", nullable: false),
+                    ApiKey = table.Column<string>(type: "text", nullable: true),
+                    OAuthClientId = table.Column<string>(type: "text", nullable: true),
+                    OAuthClientSecret = table.Column<string>(type: "text", nullable: true),
+                    OAuthTokenUrl = table.Column<string>(type: "text", nullable: true),
+                    CertificateThumbprint = table.Column<string>(type: "text", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VendorIntegrations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VendorIntegrations_Vendors_VendorId",
                         column: x => x.VendorId,
                         principalTable: "Vendors",
                         principalColumn: "Id",
@@ -306,12 +350,13 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Points",
+                name: "RewardPoints",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CustomerId = table.Column<string>(type: "text", nullable: false),
+                    RewardId = table.Column<int>(type: "integer", nullable: false),
                     VendorId = table.Column<int>(type: "integer", nullable: false),
                     OutletId = table.Column<int>(type: "integer", nullable: true),
                     Point = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
@@ -320,20 +365,26 @@ namespace api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Points", x => x.Id);
+                    table.PrimaryKey("PK_RewardPoints", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Points_AspNetUsers_CustomerId",
+                        name: "FK_RewardPoints_AspNetUsers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Points_Outlets_OutletId",
+                        name: "FK_RewardPoints_Outlets_OutletId",
                         column: x => x.OutletId,
                         principalTable: "Outlets",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Points_Vendors_VendorId",
+                        name: "FK_RewardPoints_Rewards_RewardId",
+                        column: x => x.RewardId,
+                        principalTable: "Rewards",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RewardPoints_Vendors_VendorId",
                         column: x => x.VendorId,
                         principalTable: "Vendors",
                         principalColumn: "Id",
@@ -377,6 +428,12 @@ namespace api.Migrations
                 column: "OutletId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_UserCode",
+                table: "AspNetUsers",
+                column: "UserCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -408,23 +465,33 @@ namespace api.Migrations
                 column: "VendorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Points_CustomerId",
-                table: "Points",
+                name: "IX_RewardPoints_CustomerId",
+                table: "RewardPoints",
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Points_OutletId",
-                table: "Points",
+                name: "IX_RewardPoints_OutletId",
+                table: "RewardPoints",
                 column: "OutletId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Points_VendorId",
-                table: "Points",
+                name: "IX_RewardPoints_RewardId",
+                table: "RewardPoints",
+                column: "RewardId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RewardPoints_VendorId",
+                table: "RewardPoints",
                 column: "VendorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rewards_VendorId",
                 table: "Rewards",
+                column: "VendorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorIntegrations_VendorId",
+                table: "VendorIntegrations",
                 column: "VendorId");
 
             migrationBuilder.CreateIndex(
@@ -496,16 +563,19 @@ namespace api.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Points");
-
-            migrationBuilder.DropTable(
                 name: "PointsTransactions");
 
             migrationBuilder.DropTable(
-                name: "Rewards");
+                name: "RewardPoints");
+
+            migrationBuilder.DropTable(
+                name: "VendorIntegrations");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Rewards");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

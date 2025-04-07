@@ -25,5 +25,6 @@ namespace api.Dtos.VendorIntegration
         public string? CertificateThumbprint { get; set; }
 
         public bool IsActive { get; set; } = true;
+        public DateTime CreatedOn { get; set; }
     }
 }
