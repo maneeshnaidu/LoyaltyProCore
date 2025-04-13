@@ -1,7 +1,9 @@
 using api.Dtos.Account;
 using api.Interfaces;
+using api.Mappers;
 using api.Models;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +18,14 @@ namespace api.Controllers
         private readonly ITokenService _tokenService;
         private readonly SignInManager<ApplicationUser> _signinManager;
         private readonly IUserService _userService;
+        private readonly IVendorRepository _vendorRepository;
         public AccountController(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IUserService userService,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        IVendorRepository vendorRepository)
         {
+            _vendorRepository = vendorRepository;
             _userManager = userManager;
             _signinManager = signInManager;
             _userService = userService;
@@ -41,6 +46,8 @@ namespace api.Controllers
 
             if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             return Ok(
                 new NewUserDto
                 {
@@ -48,7 +55,7 @@ namespace api.Controllers
                     LastName = user.LastName,
                     UserName = user.UserName,
                     Email = user.Email,
-                    Token = _tokenService.CreateToken(user)
+                    Token = _tokenService.CreateToken(user, roles.ToList())
                 }
             );
         }
@@ -71,6 +78,7 @@ namespace api.Controllers
                 };
 
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+                var roles = await _userManager.GetRolesAsync(appUser);
 
                 if (createdUser.Succeeded)
                 {
@@ -84,7 +92,7 @@ namespace api.Controllers
                                 LastName = appUser.LastName,
                                 UserName = appUser.UserName,
                                 Email = appUser.Email,
-                                Token = _tokenService.CreateToken(appUser)
+                                Token = _tokenService.CreateToken(appUser, roles.ToList())
                             }
                         );
                     }
@@ -102,6 +110,80 @@ namespace api.Controllers
             catch (Exception e)
             {
                 return StatusCode(500, e);
+            }
+        }
+
+        [HttpPost("register-vendor")]
+        public async Task<IActionResult> RegisterVendor([FromBody] RegisterVendorDto registerDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var vendorModel = registerDto.ToVendorFromRegisterDto();
+
+                var adminUser = new ApplicationUser
+                {
+                    UserCode = await _userService.GenerateUserCodeAsync(),
+                    FirstName = registerDto.FirstName,
+                    LastName = registerDto.LastName,
+                    UserName = registerDto.Username,
+                    Email = registerDto.Email
+                };
+
+                var createdUser = await _userManager.CreateAsync(adminUser, registerDto.Password);
+                var roles = await _userManager.GetRolesAsync(adminUser);
+
+                if (createdUser.Succeeded)
+                {
+                    // Create vendor and associate with the user
+                    vendorModel.AdminId = adminUser.Id;
+                    await _vendorRepository.CreateAsync(vendorModel);
+
+                    var roleResult = await _userManager.AddToRoleAsync(adminUser, "Admin");
+                    if (roleResult.Succeeded)
+                    {
+                        return Ok(
+                            new NewUserDto
+                            {
+                                FirstName = adminUser.FirstName,
+                                LastName = adminUser.LastName,
+                                UserName = adminUser.UserName,
+                                Email = adminUser.Email,
+                                Token = _tokenService.CreateToken(adminUser, roles.ToList())
+                            }
+                        );
+                    }
+                    else
+                    {
+                        return StatusCode(500, roleResult.Errors);
+                    }
+                }
+                else
+                {
+                    return StatusCode(500, createdUser.Errors);
+                }
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await _signinManager.SignOutAsync();
+                return NoContent(); // Return 204 No Content on successful logout
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message); // Return 500 Internal Server Error if something goes wrong
             }
         }
 

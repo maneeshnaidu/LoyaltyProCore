@@ -4,6 +4,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace api.Migrations
 {
     /// <inheritdoc />
@@ -190,21 +192,22 @@ namespace api.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Category = table.Column<string>(type: "text", nullable: false),
+                    AdminId = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CoverImageUrl = table.Column<string>(type: "text", nullable: false),
                     LogoImageUrl = table.Column<string>(type: "text", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ApplicationUserId = table.Column<string>(type: "text", nullable: true)
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Vendors", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Vendors_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
+                        name: "FK_Vendors_AspNetUsers_AdminId",
+                        column: x => x.AdminId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -391,6 +394,17 @@ namespace api.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "2d7fc7fd-e4ba-4a75-98b7-60e6bada9960", null, "User", "USER" },
+                    { "841d2be2-ab69-435b-b7df-1ca50c2b7fbb", null, "Staff", "STAFF" },
+                    { "aaf8cb96-e308-4cd3-a7c6-8f7fcc29627a", null, "SuperAdmin", "SUPERADMIN" },
+                    { "eb03eb60-7b85-4201-9757-dab072a56d05", null, "Admin", "ADMIN" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -495,9 +509,9 @@ namespace api.Migrations
                 column: "VendorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vendors_ApplicationUserId",
+                name: "IX_Vendors_AdminId",
                 table: "Vendors",
-                column: "ApplicationUserId");
+                column: "AdminId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUserClaims_AspNetUsers_UserId",
@@ -535,7 +549,7 @@ namespace api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Vendors_AspNetUsers_ApplicationUserId",
+                name: "FK_Vendors_AspNetUsers_AdminId",
                 table: "Vendors");
 
             migrationBuilder.DropTable(

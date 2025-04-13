@@ -99,6 +99,16 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();
 
+// Add CORS for vercel frontend
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("AllowVercel",
+//         policy => policy
+//             .WithOrigins("http://localhost:3000/") // Replace with your actual Vercel domain
+//             .AllowAnyMethod()
+//             .AllowAnyHeader());
+// });
+
 // Add Authorization
 builder.Services.AddAuthorization(options =>
 {
@@ -129,29 +139,24 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
+app.UseCors(x => x
+     .AllowAnyMethod()
+     .AllowAnyHeader()
+     .AllowCredentials()
+      .WithOrigins("http://localhost:3000")
+      .SetIsOriginAllowed(origin => true));
+
 // Add Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.Run();
 
-// Seed Default Roles and Admin User
+// Seed Default Admin User
 static async Task SeedRolesAndAdmin(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
 {
     string adminEmail = "superadmin@example.com";
     string adminPassword = "Admin@123456";
-
-    if (!await roleManager.RoleExistsAsync("SuperAdmin"))
-        await roleManager.CreateAsync(new IdentityRole("SuperAdmin"));
-
-    if (!await roleManager.RoleExistsAsync("Admin"))
-        await roleManager.CreateAsync(new IdentityRole("Admin"));
-
-    if (!await roleManager.RoleExistsAsync("Staff"))
-        await roleManager.CreateAsync(new IdentityRole("Staff"));
-
-    if (!await roleManager.RoleExistsAsync("User"))
-        await roleManager.CreateAsync(new IdentityRole("User"));
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)

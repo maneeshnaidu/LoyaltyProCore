@@ -1,14 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 
 using api.Models;
 
 using api.Interfaces;
-
-using Microsoft.IdentityModel.Tokens;
 
 namespace api.Services
 {
@@ -23,13 +20,19 @@ namespace api.Services
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:SigningKey"]!));
         }
 
-        public string CreateToken(ApplicationUser user)
+        public string CreateToken(ApplicationUser user, IList<string> roles)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.UserName!)
             };
+
+            // Add roles as claims
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 

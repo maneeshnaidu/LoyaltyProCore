@@ -1,3 +1,4 @@
+using api.Dtos.Account;
 using api.Dtos.Vendor;
 using api.Models;
 
@@ -31,6 +32,19 @@ namespace api.Mappers
                 CoverImageUrl = vendorRequestDto.CoverImageUrl,
                 LogoImageUrl = vendorRequestDto.LogoImageUrl,
                 IsActive = vendorRequestDto.IsActive
+            };
+        }
+
+        public static Vendor ToVendorFromRegisterDto(this RegisterVendorDto vendorRequestDto)
+        {
+            return new Vendor
+            {
+                Name = vendorRequestDto.Name,
+                Description = vendorRequestDto.Description,
+                Category = vendorRequestDto.Category,
+                CoverImageUrl = vendorRequestDto.CoverImageUrl,
+                LogoImageUrl = vendorRequestDto.LogoImageUrl,
+                IsActive = true
             };
         }
 

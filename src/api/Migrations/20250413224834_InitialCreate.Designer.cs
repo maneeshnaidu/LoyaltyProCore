@@ -12,7 +12,7 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250407055957_InitialCreate")]
+    [Migration("20250413224834_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -49,6 +49,32 @@ namespace api.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "aaf8cb96-e308-4cd3-a7c6-8f7fcc29627a",
+                            Name = "SuperAdmin",
+                            NormalizedName = "SUPERADMIN"
+                        },
+                        new
+                        {
+                            Id = "eb03eb60-7b85-4201-9757-dab072a56d05",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "841d2be2-ab69-435b-b7df-1ca50c2b7fbb",
+                            Name = "Staff",
+                            NormalizedName = "STAFF"
+                        },
+                        new
+                        {
+                            Id = "2d7fc7fd-e4ba-4a75-98b7-60e6bada9960",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -516,7 +542,8 @@ namespace api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
+                    b.Property<string>("AdminId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Category")
@@ -550,7 +577,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("AdminId");
 
                     b.ToTable("Vendors");
                 });
@@ -770,9 +797,13 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.Vendor", b =>
                 {
-                    b.HasOne("api.Models.ApplicationUser", null)
+                    b.HasOne("api.Models.ApplicationUser", "Admin")
                         .WithMany("FavoriteVendors")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
                 });
 
             modelBuilder.Entity("api.Models.VendorIntegration", b =>

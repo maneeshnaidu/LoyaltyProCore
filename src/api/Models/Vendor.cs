@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace api.Models
 {
@@ -11,6 +7,7 @@ namespace api.Models
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
+        public string AdminId { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public string CoverImageUrl { get; set; } = string.Empty;
         public string LogoImageUrl { get; set; } = string.Empty;
@@ -18,5 +15,6 @@ namespace api.Models
         public DateTime? UpdatedOn { get; set; }
         public List<Outlet> Outlets { get; set; } = new List<Outlet>();
         public List<Reward> RewardPrograms { get; set; } = new List<Reward>();
+        public ApplicationUser? Admin { get; set; }
     }
 }
