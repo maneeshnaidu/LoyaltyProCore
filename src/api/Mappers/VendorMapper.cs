@@ -29,6 +29,7 @@ namespace api.Mappers
                 Name = vendorRequestDto.Name,
                 Description = vendorRequestDto.Description,
                 Category = vendorRequestDto.Category,
+                AdminId = vendorRequestDto.Username,
                 CoverImageUrl = vendorRequestDto.CoverImageUrl,
                 LogoImageUrl = vendorRequestDto.LogoImageUrl,
                 IsActive = vendorRequestDto.IsActive
@@ -42,6 +43,7 @@ namespace api.Mappers
                 Name = vendorRequestDto.Name,
                 Description = vendorRequestDto.Description,
                 Category = vendorRequestDto.Category,
+                AdminId = vendorRequestDto.Username,
                 CoverImageUrl = vendorRequestDto.CoverImageUrl,
                 LogoImageUrl = vendorRequestDto.LogoImageUrl,
                 IsActive = true

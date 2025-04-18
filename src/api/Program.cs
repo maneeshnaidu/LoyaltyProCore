@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using api.Services;
+using CloudinaryDotNet;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,6 +84,14 @@ builder.Services.AddAuthentication(options =>
         )
     };
 });
+
+// Add Cloudinary configuration
+var cloudinaryAccount = new Account(
+    builder.Configuration["Cloudinary:CloudName"],
+    builder.Configuration["Cloudinary:ApiKey"],
+    builder.Configuration["Cloudinary:ApiSecret"]
+);
+builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
 
 // Add Repositories
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
@@ -161,7 +170,7 @@ static async Task SeedRolesAndAdmin(RoleManager<IdentityRole> roleManager, UserM
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
     {
-        adminUser = new ApplicationUser { UserName = adminEmail, Email = adminEmail, FirstName = "Super", LastName = "Admin" };
+        adminUser = new ApplicationUser { UserName = "SuperAdmin", Email = adminEmail, FirstName = "Super", LastName = "Admin", UserCode = 1234 };
         await userManager.CreateAsync(adminUser, adminPassword);
         await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
     }

@@ -4,6 +4,7 @@ namespace api.Interfaces
 {
     public interface ITokenService
     {
-        string CreateToken(ApplicationUser user, IList<string> roles);
+        (string accessToken, string refreshToken) GenerateToken(ApplicationUser user, IList<string> roles);
+        string GenerateRefreshToken();
     }
 }

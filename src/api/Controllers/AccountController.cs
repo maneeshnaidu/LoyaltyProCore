@@ -48,6 +48,14 @@ namespace api.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
+            // Generate token
+            var (accessToken, refreshToken) = _tokenService.GenerateToken(user, roles.ToList());
+
+            // Save refresh token to the database
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
+            await _userManager.UpdateAsync(user);
+
             return Ok(
                 new NewUserDto
                 {
@@ -55,7 +63,9 @@ namespace api.Controllers
                     LastName = user.LastName,
                     UserName = user.UserName,
                     Email = user.Email,
-                    Token = _tokenService.CreateToken(user, roles.ToList())
+                    Token = accessToken,
+                    RefreshToken = refreshToken,
+                    Roles = roles.ToList()
                 }
             );
         }
@@ -80,6 +90,14 @@ namespace api.Controllers
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
                 var roles = await _userManager.GetRolesAsync(appUser);
 
+                // Generate token
+                var (accessToken, refreshToken) = _tokenService.GenerateToken(appUser, roles.ToList());
+
+                // Save refresh token to the database
+                appUser.RefreshToken = refreshToken;
+                appUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
+                await _userManager.UpdateAsync(appUser);
+
                 if (createdUser.Succeeded)
                 {
                     var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
@@ -88,11 +106,14 @@ namespace api.Controllers
                         return Ok(
                             new NewUserDto
                             {
+                                UserCode = appUser.UserCode,
                                 FirstName = appUser.FirstName,
                                 LastName = appUser.LastName,
                                 UserName = appUser.UserName,
                                 Email = appUser.Email,
-                                Token = _tokenService.CreateToken(appUser, roles.ToList())
+                                Token = accessToken,
+                                RefreshToken = refreshToken,
+                                Roles = roles.ToList(),
                             }
                         );
                     }
@@ -113,6 +134,71 @@ namespace api.Controllers
             }
         }
 
+        [HttpPost("register-staff")]
+        public async Task<IActionResult> RegisterStaff([FromBody] RegisterDto registerDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var appUser = new ApplicationUser
+                {
+                    UserCode = await _userService.GenerateAdminUserCodeAsync(),
+                    FirstName = registerDto.FirstName,
+                    LastName = registerDto.LastName,
+                    UserName = registerDto.Username,
+                    Email = registerDto.Email
+                };
+
+                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+                var roles = await _userManager.GetRolesAsync(appUser);
+
+                // Generate token
+                var (accessToken, refreshToken) = _tokenService.GenerateToken(appUser, roles.ToList());
+
+                // Save refresh token to the database
+                appUser.RefreshToken = refreshToken;
+                appUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
+                await _userManager.UpdateAsync(appUser);
+
+                if (createdUser.Succeeded)
+                {
+                    var roleResult = await _userManager.AddToRoleAsync(appUser, "Staff");
+                    if (roleResult.Succeeded)
+                    {
+                        return Ok(
+                            new NewUserDto
+                            {
+                                UserCode = appUser.UserCode,
+                                FirstName = appUser.FirstName,
+                                LastName = appUser.LastName,
+                                UserName = appUser.UserName,
+                                Email = appUser.Email,
+                                Token = accessToken,
+                                RefreshToken = refreshToken,
+                                Roles = roles.ToList()
+                            }
+                        );
+                    }
+                    else
+                    {
+                        return StatusCode(500, roleResult.Errors);
+                    }
+                }
+                else
+                {
+                    return StatusCode(500, createdUser.Errors);
+                }
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
+
+        }
+
         [HttpPost("register-vendor")]
         public async Task<IActionResult> RegisterVendor([FromBody] RegisterVendorDto registerDto)
         {
@@ -125,7 +211,7 @@ namespace api.Controllers
 
                 var adminUser = new ApplicationUser
                 {
-                    UserCode = await _userService.GenerateUserCodeAsync(),
+                    UserCode = await _userService.GenerateAdminUserCodeAsync(),
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
                     UserName = registerDto.Username,
@@ -144,6 +230,14 @@ namespace api.Controllers
                     var roleResult = await _userManager.AddToRoleAsync(adminUser, "Admin");
                     if (roleResult.Succeeded)
                     {
+                        // Generate token
+                        var (accessToken, refreshToken) = _tokenService.GenerateToken(adminUser, roles.ToList());
+
+                        // Save refresh token to the database
+                        adminUser.RefreshToken = refreshToken;
+                        adminUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
+                        await _userManager.UpdateAsync(adminUser);
+
                         return Ok(
                             new NewUserDto
                             {
@@ -151,7 +245,9 @@ namespace api.Controllers
                                 LastName = adminUser.LastName,
                                 UserName = adminUser.UserName,
                                 Email = adminUser.Email,
-                                Token = _tokenService.CreateToken(adminUser, roles.ToList())
+                                Token = accessToken,
+                                RefreshToken = refreshToken,
+                                Roles = roles.ToList()
                             }
                         );
                     }
@@ -185,6 +281,31 @@ namespace api.Controllers
             {
                 return StatusCode(500, e.Message); // Return 500 Internal Server Error if something goes wrong
             }
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshTokenDto.RefreshToken);
+
+            if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+                return Unauthorized("Invalid or expired refresh token");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // Generate new tokens
+            var (accessToken, refreshToken) = _tokenService.GenerateToken(user, roles);
+
+            // Update refresh token in the database
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new
+            {
+                Token = accessToken,
+                RefreshToken = refreshToken
+            });
         }
 
     }

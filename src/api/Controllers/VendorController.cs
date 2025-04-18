@@ -5,6 +5,8 @@ using api.Interfaces;
 using api.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using api.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace api.Controllers
 {
@@ -13,10 +15,25 @@ namespace api.Controllers
     public class VendorController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ITokenService _tokenService;
+        private readonly IUserService _userService;
         private readonly IVendorRepository _vendorRepository;
         private readonly IOutletRepository _outletRepository;
-        public VendorController(ApplicationDBContext context, IVendorRepository vendorRepository, IOutletRepository outletRepository)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public VendorController(
+            ApplicationDBContext context,
+            UserManager<ApplicationUser> userManager,
+            ITokenService tokenService,
+            IUserService userService,
+            IVendorRepository vendorRepository,
+            IOutletRepository outletRepository,
+            IWebHostEnvironment webHostEnvironment)
         {
+            _webHostEnvironment = webHostEnvironment;
+            _userManager = userManager;
+            _tokenService = tokenService;
+            _userService = userService;
             _vendorRepository = vendorRepository;
             _outletRepository = outletRepository;
             _context = context;
@@ -56,14 +73,65 @@ namespace api.Controllers
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateVendorRequestDto vendorRequestDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            var vendorModel = vendorRequestDto.ToVendorFromCreateDto();
+                var vendorModel = vendorRequestDto.ToVendorFromCreateDto();
 
-            await _vendorRepository.CreateAsync(vendorModel);
+                var adminUser = new ApplicationUser
+                {
+                    UserCode = await _userService.GenerateAdminUserCodeAsync(),
+                    FirstName = vendorRequestDto.FirstName,
+                    LastName = vendorRequestDto.LastName,
+                    UserName = vendorRequestDto.Username,
+                    Email = vendorRequestDto.Email
+                };
 
-            return CreatedAtAction(nameof(GetById), new { id = vendorModel.Id }, vendorModel.ToVendorDto());
+                var createdUser = await _userManager.CreateAsync(adminUser, vendorRequestDto.Password);
+                var roles = await _userManager.GetRolesAsync(adminUser);
+
+                if (createdUser.Succeeded)
+                {
+                    // Create vendor and associate with the user
+                    vendorModel.AdminId = adminUser.Id;
+                    await _vendorRepository.CreateAsync(vendorModel);
+
+                    var roleResult = await _userManager.AddToRoleAsync(adminUser, "Admin");
+                    if (roleResult.Succeeded)
+                    {
+                        // Generate token
+                        var (accessToken, refreshToken) = _tokenService.GenerateToken(adminUser, roles.ToList());
+
+                        // Save refresh token to the database
+                        adminUser.RefreshToken = refreshToken;
+                        adminUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
+                        await _userManager.UpdateAsync(adminUser);
+
+                        return Ok(
+                            CreatedAtAction(
+                                nameof(GetById),
+                                new { id = vendorModel.Id },
+                                vendorModel.ToVendorDto()
+                            )
+                        );
+                    }
+                    else
+                    {
+                        return StatusCode(500, roleResult.Errors);
+                    }
+                }
+                else
+                {
+                    return StatusCode(500, createdUser.Errors);
+                }
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e);
+            }
         }
 
         [HttpPut]
@@ -109,6 +177,18 @@ namespace api.Controllers
             return BadRequest("Deletion failed. Vendor has exisiting outlets");
 
 
+        }
+
+        private async Task<string> UploadFile(string folderPath, IFormFile file)
+        {
+            folderPath += Guid.NewGuid().ToString() + "_" + file.FileName;
+
+            string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folderPath);
+
+            await file.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+
+
+            return "/" + folderPath;
         }
     }
 }

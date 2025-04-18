@@ -7,7 +7,7 @@ namespace api.Models
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
-        public string AdminId { get; set; } = string.Empty;
+        public required string AdminId { get; set; }
         public bool IsActive { get; set; }
         public string CoverImageUrl { get; set; } = string.Empty;
         public string LogoImageUrl { get; set; } = string.Empty;

@@ -11,5 +11,6 @@ namespace api.Interfaces
     {
         Task<ApplicationUser?> GetUserByUserCodeAsync(int userCode);
         Task<int> GenerateUserCodeAsync();
+        Task<int> GenerateAdminUserCodeAsync();
     }
 }

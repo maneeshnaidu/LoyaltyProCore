@@ -35,5 +35,20 @@ namespace api.Services
 
             return newCode;
         }
+
+        public async Task<int> GenerateAdminUserCodeAsync()
+        {
+            var random = new Random();
+            int newCode;
+
+            do
+            {
+                newCode = random.Next(1000, 9999); // Generate a random 4-digit number
+                // Check if the generated code already exists in the database
+            }
+            while (await _userManager.Users.AnyAsync(u => u.UserCode == newCode));
+
+            return newCode;
+        }
     }
 }

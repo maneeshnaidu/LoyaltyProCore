@@ -8,6 +8,8 @@ namespace api.Models
         public string FirstName { get; set; } = string.Empty;
         public string? LastName { get; set; }
         public int? OutletId { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
         public Outlet? Outlet { get; set; }
         public List<Vendor>? FavoriteVendors { get; set; } = new List<Vendor>();
         public List<RewardPoints>? StampCard { get; set; } = new List<RewardPoints>();
