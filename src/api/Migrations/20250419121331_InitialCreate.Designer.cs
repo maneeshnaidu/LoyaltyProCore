@@ -12,8 +12,8 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250417081024_TokenUpdate")]
-    partial class TokenUpdate
+    [Migration("20250419121331_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,25 +53,25 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "154023f4-7c3e-4076-83b5-090e0a5abff6",
+                            Id = "cee16247-3ea4-4f50-af57-4ec282064b0a",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
-                            Id = "d856f8f5-1b64-48df-966d-05420d0d19fd",
+                            Id = "34997ffb-ee92-45ed-8c83-85d3d28dff2c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "3259a927-2f95-4e00-bd29-77430cf3c6c4",
+                            Id = "8330d038-f391-4b18-ae16-41ef55ad0d58",
                             Name = "Staff",
                             NormalizedName = "STAFF"
                         },
                         new
                         {
-                            Id = "6ddb101c-76aa-4e57-9878-49522e1035c1",
+                            Id = "3d32dc2b-1cf8-4a9f-ba6e-d0388c7ac0af",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -253,6 +253,9 @@ namespace api.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<int?>("VendorId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

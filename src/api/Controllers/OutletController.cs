@@ -9,15 +9,24 @@ using Microsoft.AspNetCore.Mvc;
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api/outlet")]
+    [Route("api/outlets")]
     public class OutletController : ControllerBase
     {
+        private readonly ApplicationDBContext _context;
         private readonly IOutletRepository _outletRepository;
         private readonly IVendorRepository _vendorRepository;
-        public OutletController(ApplicationDBContext context, IOutletRepository outletRepository, IVendorRepository vendorRepository)
+        private readonly IUserService _userService;
+        public OutletController(
+            ApplicationDBContext context,
+            IOutletRepository outletRepository,
+            IVendorRepository vendorRepository,
+            IUserService userService
+            )
         {
             _outletRepository = outletRepository;
             _vendorRepository = vendorRepository;
+            _userService = userService;
+            _context = context;
         }
 
         [HttpGet]
@@ -49,21 +58,27 @@ namespace api.Controllers
             return Ok(outlet.ToOutletDto());
         }
 
-        [HttpPost("{vendorId}")]
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Create([FromRoute] int vendorId, CreateOutletDto outletDto)
+        public async Task<IActionResult> Create([FromForm] CreateOutletDto outletDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var vendor = await _vendorRepository.VendorExists(vendorId);
+            var adminUser = await _userService.GetUserByUserNameAsync(outletDto.UserName);
+            if (adminUser == null)
+            {
+                return BadRequest("Admin user not found");
+            }
 
-            if (vendor == false)
+            var vendor = await _vendorRepository.GetByAdminAsync(adminUser.Id);
+            if (vendor == null)
             {
                 return BadRequest("Vendor does not exist");
             }
 
             var outletModel = outletDto.ToOutletFromCreateDto();
+            outletModel.VendorId = vendor.Id;
             await _outletRepository.CreateAsync(outletModel);
             return CreatedAtAction(nameof(GetById), new { id = outletModel.Id }, outletModel.ToOutletDto());
         }

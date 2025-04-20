@@ -11,5 +11,6 @@ namespace api.Dtos.Outlet
         public required string Address { get; set; }
         public bool IsActive { get; set; }
         public int? VendorId { get; set; }
+        public DateTime CreatedOn { get; set; }
     }
 }

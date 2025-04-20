@@ -50,25 +50,25 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "154023f4-7c3e-4076-83b5-090e0a5abff6",
+                            Id = "cbe7a7ee-7c8e-483d-9e9c-64a13f89cf4c",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
-                            Id = "d856f8f5-1b64-48df-966d-05420d0d19fd",
+                            Id = "461efe22-49fe-4fd4-bc6b-d6c3f071724b",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "3259a927-2f95-4e00-bd29-77430cf3c6c4",
+                            Id = "78c86abc-3422-4308-af50-747f3cd0a5f5",
                             Name = "Staff",
                             NormalizedName = "STAFF"
                         },
                         new
                         {
-                            Id = "6ddb101c-76aa-4e57-9878-49522e1035c1",
+                            Id = "0cbcf455-a539-4991-b4b9-5d9a6c3baca5",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -251,6 +251,9 @@ namespace api.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<int?>("VendorId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -264,6 +267,8 @@ namespace api.Migrations
 
                     b.HasIndex("UserCode")
                         .IsUnique();
+
+                    b.HasIndex("VendorId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -545,10 +550,6 @@ namespace api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdminId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("text");
@@ -579,8 +580,6 @@ namespace api.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AdminId");
 
                     b.ToTable("Vendors");
                 });
@@ -708,6 +707,10 @@ namespace api.Migrations
                         .WithMany()
                         .HasForeignKey("OutletId");
 
+                    b.HasOne("api.Models.Vendor", null)
+                        .WithMany("Users")
+                        .HasForeignKey("VendorId");
+
                     b.Navigation("Outlet");
                 });
 
@@ -798,17 +801,6 @@ namespace api.Migrations
                     b.Navigation("Vendor");
                 });
 
-            modelBuilder.Entity("api.Models.Vendor", b =>
-                {
-                    b.HasOne("api.Models.ApplicationUser", "Admin")
-                        .WithMany("FavoriteVendors")
-                        .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Admin");
-                });
-
             modelBuilder.Entity("api.Models.VendorIntegration", b =>
                 {
                     b.HasOne("api.Models.Vendor", "Vendor")
@@ -822,8 +814,6 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("FavoriteVendors");
-
                     b.Navigation("StampCard");
                 });
 
@@ -832,6 +822,8 @@ namespace api.Migrations
                     b.Navigation("Outlets");
 
                     b.Navigation("RewardPrograms");
+
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

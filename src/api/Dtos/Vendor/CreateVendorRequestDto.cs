@@ -21,8 +21,9 @@ namespace api.Dtos.Vendor
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
-        public string CoverImageUrl { get; set; } = string.Empty;
-        public string LogoImageUrl { get; set; } = string.Empty;
-        public bool IsActive { get; set; }
+        public IFormFile? CoverImage { get; set; }
+        public string? CoverImageUrl { get; set; }
+        public IFormFile? LogoImage { get; set; }
+        public string? LogoImageUrl { get; set; }
     }
 }

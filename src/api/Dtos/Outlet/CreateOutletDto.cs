@@ -8,8 +8,8 @@ namespace api.Dtos.Outlet
 {
     public class CreateOutletDto
     {
-        public int VendorId { get; set; }
+        public required string UserName { get; set; }
         public required string Address { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }

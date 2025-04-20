@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using api.Services;
 using CloudinaryDotNet;
+using api.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,7 @@ builder.Services.AddSwaggerGen(option =>
             new string[]{}
         }
     });
+    option.OperationFilter<SwaggerFileUploadOperationFilter>();
 });
 
 // Add DBContext
@@ -105,6 +107,7 @@ builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 // Add Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUploadFileService, UploadFileService>();
 
 builder.Services.AddControllers();
 
@@ -170,7 +173,7 @@ static async Task SeedRolesAndAdmin(RoleManager<IdentityRole> roleManager, UserM
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
     {
-        adminUser = new ApplicationUser { UserName = "SuperAdmin", Email = adminEmail, FirstName = "Super", LastName = "Admin", UserCode = 1234 };
+        adminUser = new ApplicationUser { UserName = "superadmin", Email = adminEmail, FirstName = "Super", LastName = "Admin", UserCode = 1234 };
         await userManager.CreateAsync(adminUser, adminPassword);
         await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
     }

@@ -12,7 +12,8 @@ namespace api.Mappers
                 Id = outletModel.Id,
                 Address = outletModel.Address,
                 VendorId = outletModel.VendorId,
-                IsActive = outletModel.IsActive
+                IsActive = outletModel.IsActive,
+                CreatedOn = outletModel.CreatedOn,
             };
         }
 
@@ -20,9 +21,8 @@ namespace api.Mappers
         {
             return new Outlet
             {
-                VendorId = outletDto.VendorId,
                 Address = outletDto.Address,
-                IsActive = outletDto.IsActive
+                IsActive = outletDto.IsActive,
             };
         }
     }

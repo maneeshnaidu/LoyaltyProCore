@@ -11,9 +11,11 @@ namespace api.Repository
     public class VendorRepository : IVendorRepository
     {
         private readonly ApplicationDBContext _context;
-        public VendorRepository(ApplicationDBContext context)
+        private readonly IUserService _userService;
+        public VendorRepository(ApplicationDBContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         public async Task<Vendor> CreateAsync(Vendor vendorModel)
@@ -81,11 +83,37 @@ namespace api.Repository
 
             existingVendor.Name = vendorDto.Name;
             existingVendor.Description = vendorDto.Description;
+            existingVendor.Category = vendorDto.Category;
 
             await _context.SaveChangesAsync();
 
             return existingVendor;
         }
 
+        public async Task<Vendor?> ToggleStatusAsync(int id)
+        {
+            var vendor = await _context.Vendors.FirstOrDefaultAsync(x => x.Id == id);
+            if (vendor == null)
+            {
+                return null;
+            }
+
+            vendor.IsActive = !vendor.IsActive;
+            await _context.SaveChangesAsync();
+            return vendor;
+        }
+
+        public async Task<Vendor?> GetByAdminAsync(string userId)
+        {
+            var user = await _userService.GetVendorByIdAsync(userId); // Await the result of the async method
+            if (user != null)
+            {
+                return await _context.Vendors
+                    .Include(v => v.Outlets)
+                    .FirstOrDefaultAsync(v => v.Id == user.Value); // Use user.Value to access the nullable int
+            }
+
+            return null; // Return null if user is null
+        }
     }
 }

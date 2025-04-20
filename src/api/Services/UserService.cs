@@ -1,4 +1,7 @@
 
+
+using api.Data;
+using api.Helpers;
 using api.Interfaces;
 using api.Models;
 
@@ -19,6 +22,18 @@ namespace api.Services
         {
             return await _userManager.Users
             .FirstOrDefaultAsync(u => u.UserCode == userCode);
+        }
+
+        public async Task<ApplicationUser?> GetUserByUserNameAsync(string userName)
+        {
+            return await _userManager.Users
+            .FirstOrDefaultAsync(u => u.UserName == userName);
+        }
+
+        public async Task<int?> GetVendorByIdAsync(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            return user?.VendorId;
         }
 
         public async Task<int> GenerateUserCodeAsync()
@@ -49,6 +64,28 @@ namespace api.Services
             while (await _userManager.Users.AnyAsync(u => u.UserCode == newCode));
 
             return newCode;
+        }
+
+        public async Task<List<ApplicationUser>> GetAllAsync(QueryObject query)
+        {
+            var usersQuery = _userManager.Users.AsQueryable();
+
+            // Filter by Role if provided
+            if (!string.IsNullOrEmpty(query.Role))
+            {
+                // Get users in the specified role
+                var usersInRole = await _userManager.GetUsersInRoleAsync(query.Role);
+                usersQuery = usersQuery.Where(u => usersInRole.Select(r => r.Id).Contains(u.Id));
+            }
+
+            // Filter by Vendor if provided
+            if (query.VendorId != null)
+            {
+                usersQuery = usersQuery.Where(u => u.VendorId == query.VendorId);
+            }
+
+            // Execute the query and return the results
+            return await usersQuery.ToListAsync();
         }
     }
 }

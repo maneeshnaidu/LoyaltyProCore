@@ -85,6 +85,8 @@ namespace api.Repository
             }
 
             existingOutlet.Address = outletDto.Address;
+            existingOutlet.IsActive = outletDto.IsActive;
+            existingOutlet.UpdatedOn = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 

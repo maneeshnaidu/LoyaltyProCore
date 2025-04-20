@@ -142,7 +142,10 @@ namespace api.Migrations
                     UserCode = table.Column<int>(type: "integer", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: true),
+                    VendorId = table.Column<int>(type: "integer", nullable: true),
                     OutletId = table.Column<int>(type: "integer", nullable: true),
+                    RefreshToken = table.Column<string>(type: "text", nullable: true),
+                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -399,10 +402,10 @@ namespace api.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "2d7fc7fd-e4ba-4a75-98b7-60e6bada9960", null, "User", "USER" },
-                    { "841d2be2-ab69-435b-b7df-1ca50c2b7fbb", null, "Staff", "STAFF" },
-                    { "aaf8cb96-e308-4cd3-a7c6-8f7fcc29627a", null, "SuperAdmin", "SUPERADMIN" },
-                    { "eb03eb60-7b85-4201-9757-dab072a56d05", null, "Admin", "ADMIN" }
+                    { "34997ffb-ee92-45ed-8c83-85d3d28dff2c", null, "Admin", "ADMIN" },
+                    { "3d32dc2b-1cf8-4a9f-ba6e-d0388c7ac0af", null, "User", "USER" },
+                    { "8330d038-f391-4b18-ae16-41ef55ad0d58", null, "Staff", "STAFF" },
+                    { "cee16247-3ea4-4f50-af57-4ec282064b0a", null, "SuperAdmin", "SUPERADMIN" }
                 });
 
             migrationBuilder.CreateIndex(

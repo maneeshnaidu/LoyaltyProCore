@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using api.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace api.Controllers
 {
@@ -14,29 +15,26 @@ namespace api.Controllers
     [ApiController]
     public class VendorController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
+        private readonly IUploadFileService _uploadFileService;
         private readonly IVendorRepository _vendorRepository;
         private readonly IOutletRepository _outletRepository;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         public VendorController(
-            ApplicationDBContext context,
             UserManager<ApplicationUser> userManager,
             ITokenService tokenService,
             IUserService userService,
             IVendorRepository vendorRepository,
             IOutletRepository outletRepository,
-            IWebHostEnvironment webHostEnvironment)
+            IUploadFileService uploadFileService)
         {
-            _webHostEnvironment = webHostEnvironment;
+            _uploadFileService = uploadFileService;
             _userManager = userManager;
             _tokenService = tokenService;
             _userService = userService;
             _vendorRepository = vendorRepository;
             _outletRepository = outletRepository;
-            _context = context;
         }
 
         [HttpGet]
@@ -48,9 +46,9 @@ namespace api.Controllers
 
             var vendors = await _vendorRepository.GetAllAsync(query);
 
-            var vendorDto = vendors.Select(v => v.ToVendorDto()).ToList();
+            var vendorDtos = vendors.Select(v => v.ToVendorDto()).ToList();
 
-            return Ok(vendorDto);
+            return Ok(vendorDtos);
         }
 
         [HttpGet("{id:int}")]
@@ -71,7 +69,7 @@ namespace api.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Create([FromBody] CreateVendorRequestDto vendorRequestDto)
+        public async Task<IActionResult> Create([FromForm] CreateVendorRequestDto vendorRequestDto)
         {
             try
             {
@@ -79,54 +77,80 @@ namespace api.Controllers
                     return BadRequest(ModelState);
 
                 var vendorModel = vendorRequestDto.ToVendorFromCreateDto();
-
-                var adminUser = new ApplicationUser
+                // Upload images if provided
+                try
                 {
-                    UserCode = await _userService.GenerateAdminUserCodeAsync(),
-                    FirstName = vendorRequestDto.FirstName,
-                    LastName = vendorRequestDto.LastName,
-                    UserName = vendorRequestDto.Username,
-                    Email = vendorRequestDto.Email
-                };
-
-                var createdUser = await _userManager.CreateAsync(adminUser, vendorRequestDto.Password);
-                var roles = await _userManager.GetRolesAsync(adminUser);
-
-                if (createdUser.Succeeded)
-                {
-                    // Create vendor and associate with the user
-                    vendorModel.AdminId = adminUser.Id;
-                    await _vendorRepository.CreateAsync(vendorModel);
-
-                    var roleResult = await _userManager.AddToRoleAsync(adminUser, "Admin");
-                    if (roleResult.Succeeded)
+                    if (vendorRequestDto.CoverImage != null)
                     {
-                        // Generate token
-                        var (accessToken, refreshToken) = _tokenService.GenerateToken(adminUser, roles.ToList());
+                        var uploadCover = await _uploadFileService.UploadFileAsync(vendorRequestDto.CoverImage);
+                        vendorModel.CoverImageUrl = uploadCover.Url;
+                    }
+                    if (vendorRequestDto.LogoImage != null)
+                    {
+                        var uploadLogo = await _uploadFileService.UploadFileAsync(vendorRequestDto.LogoImage);
+                        vendorModel.LogoImageUrl = uploadLogo.Url;
+                    }
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "An error occurred while uploading the file... " + ex);
+                }
 
-                        // Save refresh token to the database
-                        adminUser.RefreshToken = refreshToken;
-                        adminUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
-                        await _userManager.UpdateAsync(adminUser);
+                var newVendor = await _vendorRepository.CreateAsync(vendorModel);
 
-                        return Ok(
-                            CreatedAtAction(
-                                nameof(GetById),
-                                new { id = vendorModel.Id },
-                                vendorModel.ToVendorDto()
-                            )
-                        );
+                if (newVendor != null)
+                {
+                    var adminUser = new ApplicationUser
+                    {
+                        UserCode = await _userService.GenerateAdminUserCodeAsync(),
+                        FirstName = vendorRequestDto.FirstName,
+                        LastName = vendorRequestDto.LastName,
+                        UserName = vendorRequestDto.Username,
+                        Email = vendorRequestDto.Email,
+                        VendorId = newVendor.Id
+                    };
+
+                    var createdUser = await _userManager.CreateAsync(adminUser, vendorRequestDto.Password);
+                    var roles = await _userManager.GetRolesAsync(adminUser);
+                    if (createdUser.Succeeded)
+                    {
+                        var roleResult = await _userManager.AddToRoleAsync(adminUser, "Admin");
+                        if (roleResult.Succeeded)
+                        {
+                            // Generate token
+                            var (accessToken, refreshToken) = _tokenService.GenerateToken(adminUser, roles.ToList());
+
+                            // Save refresh token to the database
+                            adminUser.RefreshToken = refreshToken;
+                            adminUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
+                            await _userManager.UpdateAsync(adminUser);
+
+                            return Ok(
+                                CreatedAtAction(
+                                    nameof(GetById),
+                                    new { id = vendorModel.Id },
+                                    vendorModel.ToVendorDto()
+                                )
+                            );
+                        }
+                        else
+                        {
+                            return StatusCode(500, roleResult.Errors);
+                        }
                     }
                     else
                     {
-                        return StatusCode(500, roleResult.Errors);
+                        return StatusCode(500, createdUser.Errors);
                     }
                 }
                 else
                 {
-                    return StatusCode(500, createdUser.Errors);
+                    return StatusCode(500);
                 }
-
             }
             catch (Exception e)
             {
@@ -179,16 +203,28 @@ namespace api.Controllers
 
         }
 
-        private async Task<string> UploadFile(string folderPath, IFormFile file)
+        [HttpPatch]
+        [Authorize]
+        [Route("{id:int}/toggle-active")]
+        public async Task<IActionResult> ToggleIsActive([FromRoute] int id)
         {
-            folderPath += Guid.NewGuid().ToString() + "_" + file.FileName;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folderPath);
+            // Retrieve the vendor by ID
+            var vendor = await _vendorRepository.GetByIdAsync(id);
 
-            await file.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+            if (vendor == null)
+                return NotFound("Vendor not found.");
 
+            // Update the vendor in the database
+            var updatedVendor = await _vendorRepository.ToggleStatusAsync(id);
 
-            return "/" + folderPath;
+            if (updatedVendor == null)
+                return StatusCode(500, "Failed to update vendor status.");
+
+            return Ok(updatedVendor.ToVendorDto());
         }
+
     }
 }

@@ -12,8 +12,8 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250413224834_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250420031604_VendorUpdate")]
+    partial class VendorUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,25 +53,25 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "aaf8cb96-e308-4cd3-a7c6-8f7fcc29627a",
+                            Id = "cbe7a7ee-7c8e-483d-9e9c-64a13f89cf4c",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
-                            Id = "eb03eb60-7b85-4201-9757-dab072a56d05",
+                            Id = "461efe22-49fe-4fd4-bc6b-d6c3f071724b",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "841d2be2-ab69-435b-b7df-1ca50c2b7fbb",
+                            Id = "78c86abc-3422-4308-af50-747f3cd0a5f5",
                             Name = "Staff",
                             NormalizedName = "STAFF"
                         },
                         new
                         {
-                            Id = "2d7fc7fd-e4ba-4a75-98b7-60e6bada9960",
+                            Id = "0cbcf455-a539-4991-b4b9-5d9a6c3baca5",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -235,6 +235,12 @@ namespace api.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -247,6 +253,9 @@ namespace api.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<int?>("VendorId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -261,6 +270,8 @@ namespace api.Migrations
 
                     b.HasIndex("UserCode")
                         .IsUnique();
+
+                    b.HasIndex("VendorId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -542,10 +553,6 @@ namespace api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdminId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("text");
@@ -576,8 +583,6 @@ namespace api.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AdminId");
 
                     b.ToTable("Vendors");
                 });
@@ -705,6 +710,10 @@ namespace api.Migrations
                         .WithMany()
                         .HasForeignKey("OutletId");
 
+                    b.HasOne("api.Models.Vendor", null)
+                        .WithMany("Users")
+                        .HasForeignKey("VendorId");
+
                     b.Navigation("Outlet");
                 });
 
@@ -795,17 +804,6 @@ namespace api.Migrations
                     b.Navigation("Vendor");
                 });
 
-            modelBuilder.Entity("api.Models.Vendor", b =>
-                {
-                    b.HasOne("api.Models.ApplicationUser", "Admin")
-                        .WithMany("FavoriteVendors")
-                        .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Admin");
-                });
-
             modelBuilder.Entity("api.Models.VendorIntegration", b =>
                 {
                     b.HasOne("api.Models.Vendor", "Vendor")
@@ -819,8 +817,6 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("FavoriteVendors");
-
                     b.Navigation("StampCard");
                 });
 
@@ -829,6 +825,8 @@ namespace api.Migrations
                     b.Navigation("Outlets");
 
                     b.Navigation("RewardPrograms");
+
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

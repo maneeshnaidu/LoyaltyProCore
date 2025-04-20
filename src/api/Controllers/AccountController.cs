@@ -208,59 +208,58 @@ namespace api.Controllers
                     return BadRequest(ModelState);
 
                 var vendorModel = registerDto.ToVendorFromRegisterDto();
-
-                var adminUser = new ApplicationUser
+                var newVendor = await _vendorRepository.CreateAsync(vendorModel);
+                if (newVendor != null)
                 {
-                    UserCode = await _userService.GenerateAdminUserCodeAsync(),
-                    FirstName = registerDto.FirstName,
-                    LastName = registerDto.LastName,
-                    UserName = registerDto.Username,
-                    Email = registerDto.Email
-                };
-
-                var createdUser = await _userManager.CreateAsync(adminUser, registerDto.Password);
-                var roles = await _userManager.GetRolesAsync(adminUser);
-
-                if (createdUser.Succeeded)
-                {
-                    // Create vendor and associate with the user
-                    vendorModel.AdminId = adminUser.Id;
-                    await _vendorRepository.CreateAsync(vendorModel);
-
-                    var roleResult = await _userManager.AddToRoleAsync(adminUser, "Admin");
-                    if (roleResult.Succeeded)
+                    var adminUser = new ApplicationUser
                     {
-                        // Generate token
-                        var (accessToken, refreshToken) = _tokenService.GenerateToken(adminUser, roles.ToList());
+                        UserCode = await _userService.GenerateAdminUserCodeAsync(),
+                        FirstName = registerDto.FirstName,
+                        LastName = registerDto.LastName,
+                        UserName = registerDto.Username,
+                        Email = registerDto.Email
+                    };
 
-                        // Save refresh token to the database
-                        adminUser.RefreshToken = refreshToken;
-                        adminUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
-                        await _userManager.UpdateAsync(adminUser);
+                    var createdUser = await _userManager.CreateAsync(adminUser, registerDto.Password);
+                    var roles = await _userManager.GetRolesAsync(adminUser);
 
-                        return Ok(
-                            new NewUserDto
-                            {
-                                FirstName = adminUser.FirstName,
-                                LastName = adminUser.LastName,
-                                UserName = adminUser.UserName,
-                                Email = adminUser.Email,
-                                Token = accessToken,
-                                RefreshToken = refreshToken,
-                                Roles = roles.ToList()
-                            }
-                        );
+                    if (createdUser.Succeeded)
+                    {
+                        var roleResult = await _userManager.AddToRoleAsync(adminUser, "Admin");
+                        if (roleResult.Succeeded)
+                        {
+                            // Generate token
+                            var (accessToken, refreshToken) = _tokenService.GenerateToken(adminUser, roles.ToList());
+
+                            // Save refresh token to the database
+                            adminUser.RefreshToken = refreshToken;
+                            adminUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
+                            await _userManager.UpdateAsync(adminUser);
+
+                            return Ok(
+                                new NewUserDto
+                                {
+                                    FirstName = adminUser.FirstName,
+                                    LastName = adminUser.LastName,
+                                    UserName = adminUser.UserName,
+                                    Email = adminUser.Email,
+                                    Token = accessToken,
+                                    RefreshToken = refreshToken,
+                                    Roles = roles.ToList()
+                                }
+                            );
+                        }
+                        else
+                        {
+                            return StatusCode(500, roleResult.Errors);
+                        }
                     }
                     else
                     {
-                        return StatusCode(500, roleResult.Errors);
+                        return StatusCode(500, createdUser.Errors);
                     }
                 }
-                else
-                {
-                    return StatusCode(500, createdUser.Errors);
-                }
-
+                return StatusCode(500);
             }
             catch (Exception e)
             {
