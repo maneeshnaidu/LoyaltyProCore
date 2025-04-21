@@ -12,6 +12,7 @@ namespace api.Dtos.Account
         public required string UserName { get; set; }
         public int UserCode { get; set; }
         public required string Email { get; set; }
+        public int? Vendor { get; set; }
         public required string Token { get; set; }
         public string RefreshToken { get; set; } = string.Empty;
         public IList<string?> Roles { get; set; } = [];

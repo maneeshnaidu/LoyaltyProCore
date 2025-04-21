@@ -63,6 +63,7 @@ namespace api.Controllers
                     LastName = user.LastName,
                     UserName = user.UserName,
                     Email = user.Email,
+                    Vendor = user.VendorId,
                     Token = accessToken,
                     RefreshToken = refreshToken,
                     Roles = roles.ToList()
@@ -111,6 +112,7 @@ namespace api.Controllers
                                 LastName = appUser.LastName,
                                 UserName = appUser.UserName,
                                 Email = appUser.Email,
+                                Vendor = appUser.VendorId,
                                 Token = accessToken,
                                 RefreshToken = refreshToken,
                                 Roles = roles.ToList(),
@@ -175,6 +177,7 @@ namespace api.Controllers
                                 LastName = appUser.LastName,
                                 UserName = appUser.UserName,
                                 Email = appUser.Email,
+                                Vendor = appUser.VendorId,
                                 Token = accessToken,
                                 RefreshToken = refreshToken,
                                 Roles = roles.ToList()
@@ -243,6 +246,7 @@ namespace api.Controllers
                                     LastName = adminUser.LastName,
                                     UserName = adminUser.UserName,
                                     Email = adminUser.Email,
+                                    Vendor = adminUser.VendorId,
                                     Token = accessToken,
                                     RefreshToken = refreshToken,
                                     Roles = roles.ToList()
