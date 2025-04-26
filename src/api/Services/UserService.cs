@@ -87,5 +87,11 @@ namespace api.Services
             // Execute the query and return the results
             return await usersQuery.ToListAsync();
         }
+
+        public async Task<string> GetUsernameByIdAsync(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            return user?.FirstName + " " + user?.LastName;
+        }
     }
 }

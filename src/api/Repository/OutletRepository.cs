@@ -65,9 +65,15 @@ namespace api.Repository
             return await _context.Outlets.FirstOrDefaultAsync(i => i.Id == id);
         }
 
-        public Task<bool> OutletExists(int id)
+        public async Task<string?> GetOutletAddressByIdAsync(int id)
         {
-            return _context.Outlets.AnyAsync(o => o.Id == id && o.IsActive == true);
+            var outlet = await _context.Outlets.FirstOrDefaultAsync(o => o.Id == id);
+            return outlet?.Address;
+        }
+
+        public async Task<bool> OutletExists(int id)
+        {
+            return await _context.Outlets.AnyAsync(o => o.Id == id && o.IsActive == true);
         }
 
         public Task<bool> OutletExistsByVendor(int id)

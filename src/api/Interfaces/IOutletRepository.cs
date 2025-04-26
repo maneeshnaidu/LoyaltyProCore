@@ -8,6 +8,7 @@ namespace api.Interfaces
     {
         Task<List<Outlet>> GetAllAsync(QueryObject query);
         Task<Outlet?> GetByIdAsync(int id);
+        Task<string?> GetOutletAddressByIdAsync(int id);
         Task<Outlet> CreateAsync(Outlet outletModel);
         Task<Outlet?> UpdateAsync(int id, UpdateOutletDto outletDto);
         Task<Outlet?> DeleteAsync(int id);

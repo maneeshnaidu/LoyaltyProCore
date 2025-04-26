@@ -13,6 +13,6 @@ namespace api.Dtos.Transaction
         [Column(TypeName = "decimal(18,2)")]
         public decimal Points { get; set; }
         public required string TransactionType { get; set; }
-        public int? OutletId { get; set; }
+        public int OutletId { get; set; }
     }
 }

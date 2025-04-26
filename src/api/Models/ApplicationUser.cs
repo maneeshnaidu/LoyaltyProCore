@@ -12,6 +12,7 @@ namespace api.Models
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
         public Outlet? Outlet { get; set; }
-        public List<RewardPoints>? StampCard { get; set; } = new List<RewardPoints>();
+        public List<RewardPoints>? StampCard { get; set; } = [];
+        public Vendor? Vendor { get; set; }
     }
 }

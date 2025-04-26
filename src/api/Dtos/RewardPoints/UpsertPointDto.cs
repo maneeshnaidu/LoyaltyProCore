@@ -7,7 +7,8 @@ namespace api.Dtos.RewardPoints
         public string CustomerId { get; set; } = string.Empty;
         public int RewardId { get; set; }
         public int VendorId { get; set; }
-        public int? OutletId { get; set; }
+        public int OutletId { get; set; }
+        public int? OrderId { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal Point { get; set; }
         public int Level { get; set; }

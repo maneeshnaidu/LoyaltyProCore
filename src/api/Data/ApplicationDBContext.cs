@@ -23,6 +23,8 @@ namespace api.Data
         public DbSet<Reward> Rewards { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
         public DbSet<VendorIntegration> VendorIntegrations { get; set; }
+        public DbSet<VendorOrder> VendorOrders { get; set; }
+        public DbSet<FavoriteOutlet> FavoriteOutlets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

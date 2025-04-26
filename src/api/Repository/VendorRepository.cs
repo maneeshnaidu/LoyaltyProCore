@@ -43,10 +43,10 @@ namespace api.Repository
         {
             var vendors = _context.Vendors.Include(v => v.Outlets).AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(query.CompanyName))
-            {
-                vendors = vendors.Where(x => x.Name.Contains(query.CompanyName));
-            }
+            // if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            // {
+            //     vendors = vendors.Where(x => x.Name.Contains(query.CompanyName));
+            // }
 
             if (!string.IsNullOrWhiteSpace(query.SortBy))
             {

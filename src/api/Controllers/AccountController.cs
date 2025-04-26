@@ -3,6 +3,8 @@ using api.Interfaces;
 using api.Mappers;
 using api.Models;
 
+using CloudinaryDotNet.Actions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -66,7 +68,7 @@ namespace api.Controllers
                     Vendor = user.VendorId,
                     Token = accessToken,
                     RefreshToken = refreshToken,
-                    Roles = roles.ToList()
+                    Roles = [.. roles]
                 }
             );
         }
@@ -85,10 +87,20 @@ namespace api.Controllers
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName,
                     UserName = registerDto.Username,
-                    Email = registerDto.Email
+                    Email = registerDto.Email,
+                    VendorId = registerDto.VendorId,
                 };
 
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+                if (!string.IsNullOrWhiteSpace(registerDto.Role))
+                {
+                    await _userManager.AddToRoleAsync(appUser, registerDto.Role);
+                }
+                else
+                {
+                    await _userManager.AddToRoleAsync(appUser, "User");
+                }
+
                 var roles = await _userManager.GetRolesAsync(appUser);
 
                 // Generate token
@@ -97,32 +109,25 @@ namespace api.Controllers
                 // Save refresh token to the database
                 appUser.RefreshToken = refreshToken;
                 appUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
-                await _userManager.UpdateAsync(appUser);
+                var result = await _userManager.UpdateAsync(appUser);
 
-                if (createdUser.Succeeded)
+                if (result.Succeeded)
                 {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
-                    if (roleResult.Succeeded)
-                    {
-                        return Ok(
-                            new NewUserDto
-                            {
-                                UserCode = appUser.UserCode,
-                                FirstName = appUser.FirstName,
-                                LastName = appUser.LastName,
-                                UserName = appUser.UserName,
-                                Email = appUser.Email,
-                                Vendor = appUser.VendorId,
-                                Token = accessToken,
-                                RefreshToken = refreshToken,
-                                Roles = roles.ToList(),
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
+                    return Ok(
+                        new NewUserDto
+                        {
+                            UserCode = appUser.UserCode,
+                            FirstName = appUser.FirstName,
+                            LastName = appUser.LastName,
+                            UserName = appUser.UserName,
+                            Email = appUser.Email,
+                            Vendor = appUser.VendorId,
+                            Token = accessToken,
+                            RefreshToken = refreshToken,
+                            Roles = [.. roles],
+                        }
+                    );
+
                 }
                 else
                 {
@@ -134,72 +139,6 @@ namespace api.Controllers
             {
                 return StatusCode(500, e);
             }
-        }
-
-        [HttpPost("register-staff")]
-        public async Task<IActionResult> RegisterStaff([FromBody] RegisterDto registerDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var appUser = new ApplicationUser
-                {
-                    UserCode = await _userService.GenerateAdminUserCodeAsync(),
-                    FirstName = registerDto.FirstName,
-                    LastName = registerDto.LastName,
-                    UserName = registerDto.Username,
-                    Email = registerDto.Email
-                };
-
-                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
-                var roles = await _userManager.GetRolesAsync(appUser);
-
-                // Generate token
-                var (accessToken, refreshToken) = _tokenService.GenerateToken(appUser, roles.ToList());
-
-                // Save refresh token to the database
-                appUser.RefreshToken = refreshToken;
-                appUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Set refresh token expiry
-                await _userManager.UpdateAsync(appUser);
-
-                if (createdUser.Succeeded)
-                {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "Staff");
-                    if (roleResult.Succeeded)
-                    {
-                        return Ok(
-                            new NewUserDto
-                            {
-                                UserCode = appUser.UserCode,
-                                FirstName = appUser.FirstName,
-                                LastName = appUser.LastName,
-                                UserName = appUser.UserName,
-                                Email = appUser.Email,
-                                Vendor = appUser.VendorId,
-                                Token = accessToken,
-                                RefreshToken = refreshToken,
-                                Roles = roles.ToList()
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
-                }
-                else
-                {
-                    return StatusCode(500, createdUser.Errors);
-                }
-
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e);
-            }
-
         }
 
         [HttpPost("register-vendor")]
@@ -249,7 +188,7 @@ namespace api.Controllers
                                     Vendor = adminUser.VendorId,
                                     Token = accessToken,
                                     RefreshToken = refreshToken,
-                                    Roles = roles.ToList()
+                                    Roles = [.. roles]
                                 }
                             );
                         }
@@ -310,6 +249,8 @@ namespace api.Controllers
                 RefreshToken = refreshToken
             });
         }
+
+        // [HttpPost("change-password")]
 
     }
 }

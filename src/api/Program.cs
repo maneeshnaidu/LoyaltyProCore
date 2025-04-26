@@ -95,6 +95,9 @@ var cloudinaryAccount = new Account(
 );
 builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
 
+// Add HTTP client factory
+builder.Services.AddHttpClient();
+
 // Add Repositories
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<IIntegrationRepository, IntegrationRepository>();
@@ -108,6 +111,7 @@ builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUploadFileService, UploadFileService>();
+builder.Services.AddScoped<IVendorOrderServiceFactory, VendorOrderServiceFactory>();
 
 builder.Services.AddControllers();
 

@@ -56,9 +56,13 @@ namespace api.Repository
             return await integrations.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 
-        public async Task<VendorIntegration?> GetByIdAsync(int id)
+        public async Task<VendorIntegration?> GetByIdAsync(int id, string category)
         {
-            return await _context.VendorIntegrations.FirstOrDefaultAsync(x => x.Id == id);
+            return !string.IsNullOrEmpty(category)
+                ? await _context.VendorIntegrations
+                    .FirstOrDefaultAsync(vi => vi.VendorId == id && vi.Category == category)
+                : await _context.VendorIntegrations
+                                .FirstOrDefaultAsync(vi => vi.VendorId == id);
         }
 
         public async Task<VendorIntegration?> UpdateAsync(int id, UpsertIntegrationDto requestDto)

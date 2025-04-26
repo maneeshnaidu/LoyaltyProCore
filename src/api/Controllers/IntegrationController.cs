@@ -44,7 +44,7 @@ namespace api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var integration = await _integrationRepository.GetByIdAsync(id);
+            var integration = await _integrationRepository.GetByIdAsync(id, null);
 
             if (integration == null)
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using api.Dtos.Account;
 using api.Dtos.User;
 using api.Helpers;
 using api.Interfaces;
@@ -120,6 +121,53 @@ namespace api.Controllers
             {
                 return StatusCode(500, e);
             }
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateUser([FromRoute] string id, [FromBody] UpdateUserDto updateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.FirstName = updateDto.FirstName;
+            user.LastName = updateDto.LastName;
+            user.Email = updateDto.Email;
+            user.UserName = updateDto.Username;
+            user.VendorId = updateDto.VendorId;
+
+            if (!string.IsNullOrEmpty(updateDto.Roles))
+            {
+                var roleResult = await _userManager.IsInRoleAsync(user, updateDto.Roles);
+                if (roleResult == false)
+                {
+                    await _userManager.AddToRoleAsync(user, updateDto.Roles);
+                }
+            }
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                return BadRequest(new { Errors = updateResult.Errors });
+            }
+            var roles = await _userManager.GetRolesAsync(user);
+            return Ok(new
+            {
+                user.Id,
+                user.UserName,
+                user.Email,
+                user.FirstName,
+                user.LastName,
+                user.VendorId,
+                Roles = roles
+            });
         }
 
         [HttpGet("{id:int}")]

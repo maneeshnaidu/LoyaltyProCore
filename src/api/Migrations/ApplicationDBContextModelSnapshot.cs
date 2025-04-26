@@ -50,25 +50,25 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "cbe7a7ee-7c8e-483d-9e9c-64a13f89cf4c",
+                            Id = "d32bb953-8b67-4c00-adff-1d229697a938",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
-                            Id = "461efe22-49fe-4fd4-bc6b-d6c3f071724b",
+                            Id = "f691cfc4-31ca-46b9-bc03-00dbaae0bad2",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "78c86abc-3422-4308-af50-747f3cd0a5f5",
+                            Id = "fe3e9843-9363-4071-9b0d-e0a65b80a0df",
                             Name = "Staff",
                             NormalizedName = "STAFF"
                         },
                         new
                         {
-                            Id = "0cbcf455-a539-4991-b4b9-5d9a6c3baca5",
+                            Id = "1dd17b53-e620-4590-a810-9e49a64bdef5",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -347,6 +347,26 @@ namespace api.Migrations
                     b.ToTable("Devices");
                 });
 
+            modelBuilder.Entity("api.Models.FavoriteOutlet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OutletId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FavoriteOutlets");
+                });
+
             modelBuilder.Entity("api.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -403,8 +423,20 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CoverImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -413,6 +445,10 @@ namespace api.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Longitude")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
@@ -439,8 +475,16 @@ namespace api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AddedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Customer")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("CustomerId")
                         .IsRequired()
@@ -449,11 +493,23 @@ namespace api.Migrations
                     b.Property<int?>("OrderId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("OutletId")
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OutletAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("OutletId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Points")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("StaffId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("TransactionType")
                         .IsRequired()
@@ -507,6 +563,9 @@ namespace api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
+
                     b.Property<string>("CustomerId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -517,21 +576,28 @@ namespace api.Migrations
                     b.Property<int>("Level")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("OutletId")
+                    b.Property<int?>("OrderId")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("Point")
+                    b.Property<int>("OutletId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Points")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RewardId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("StaffId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("VendorId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("OutletId");
 
@@ -650,6 +716,65 @@ namespace api.Migrations
                     b.ToTable("VendorIntegrations");
                 });
 
+            modelBuilder.Entity("api.Models.VendorOrder", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("VendorOrderReference")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VendorOrders");
+                });
+
+            modelBuilder.Entity("api.Models.VendorOrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("VendorOrderId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VendorOrderId");
+
+                    b.ToTable("VendorOrderItem");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -707,11 +832,13 @@ namespace api.Migrations
                         .WithMany()
                         .HasForeignKey("OutletId");
 
-                    b.HasOne("api.Models.Vendor", null)
+                    b.HasOne("api.Models.Vendor", "Vendor")
                         .WithMany("Users")
                         .HasForeignKey("VendorId");
 
                     b.Navigation("Outlet");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("api.Models.Device", b =>
@@ -770,15 +897,15 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Models.RewardPoints", b =>
                 {
-                    b.HasOne("api.Models.ApplicationUser", "Customer")
+                    b.HasOne("api.Models.ApplicationUser", null)
                         .WithMany("StampCard")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("api.Models.Outlet", "Outlet")
                         .WithMany()
-                        .HasForeignKey("OutletId");
+                        .HasForeignKey("OutletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("api.Models.Reward", "Reward")
                         .WithMany()
@@ -791,8 +918,6 @@ namespace api.Migrations
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Customer");
 
                     b.Navigation("Outlet");
 
@@ -812,6 +937,13 @@ namespace api.Migrations
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("api.Models.VendorOrderItem", b =>
+                {
+                    b.HasOne("api.Models.VendorOrder", null)
+                        .WithMany("Items")
+                        .HasForeignKey("VendorOrderId");
+                });
+
             modelBuilder.Entity("api.Models.ApplicationUser", b =>
                 {
                     b.Navigation("StampCard");
@@ -824,6 +956,11 @@ namespace api.Migrations
                     b.Navigation("RewardPrograms");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("api.Models.VendorOrder", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

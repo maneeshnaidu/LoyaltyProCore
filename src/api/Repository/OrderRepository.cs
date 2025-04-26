@@ -69,6 +69,12 @@ namespace api.Repository
             return await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        public async Task<string?> GetOrderNumberByIdAsync(int id)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
+            return order?.OrderNumber;
+        }
+
         public Task<bool> OrderExists(int id)
         {
             return _context.Orders.AnyAsync(o => o.Id == id);

@@ -9,12 +9,12 @@ namespace api.Dtos.Transaction
     public class TransactionDto
     {
         public int Id { get; set; }
-        public required string CustomerId { get; set; }
-        public int? OrderId { get; set; }
+        public string Customer { get; set; } = string.Empty;
+        public string OrderNumber { get; set; } = string.Empty;
         [Column(TypeName = "decimal(18,2)")]
         public decimal Points { get; set; }
         public required string TransactionType { get; set; }
-        public int? OutletId { get; set; }
-        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+        public string OutletAddress { get; set; } = string.Empty;
+        public DateTime CreatedOn { get; set; }
     }
 }

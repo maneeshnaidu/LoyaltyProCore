@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/points")]
     public class PointsController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -50,7 +50,8 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        // [Authorize]
+        [Route("{customerCode:int}")]
         public async Task<IActionResult> AddPoints([FromRoute] int customerCode, UpsertPointsDto pointsDto)
         {
             if (!ModelState.IsValid)
@@ -59,6 +60,10 @@ namespace api.Controllers
             var username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(username);
             var customer = await _userService.GetUserByUserCodeAsync(customerCode);
+            if (customer != null)
+            {
+                pointsDto.CustomerId = customer.Id;
+            }
             var reward = await _rewardRepository.GetByIdAsync(pointsDto.RewardId);
             if (appUser == null || customer == null) return BadRequest("User not found");
             if (reward == null) return BadRequest("Reward not found");
@@ -73,7 +78,7 @@ namespace api.Controllers
                 return CreatedAtAction(nameof(GetUserPoints), new { id = pointModel.Id }, pointModel);
             }
 
-            var updatedPoint = await _pointsRepository.UpdateAsync(pointModel.Id, pointModel.ToUpsertDtoFromModel());
+            var updatedPoint = await _pointsRepository.UpdateAsync(pointModel.ToUpsertDtoFromModel());
 
             return updatedPoint == null ? StatusCode(500, "Points not updated") : (IActionResult)Created();
         }

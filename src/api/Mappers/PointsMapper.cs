@@ -14,7 +14,7 @@ namespace api.Mappers
                 RewardId = pointModel.RewardId,
                 VendorId = pointModel.VendorId,
                 OutletId = pointModel.OutletId,
-                Point = pointModel.Point,
+                Point = pointModel.Points,
                 Level = pointModel.Level,
                 LastUpdatedOn = pointModel.LastUpdatedOn
             };
@@ -28,7 +28,7 @@ namespace api.Mappers
                 RewardId = pointDto.RewardId,
                 VendorId = pointDto.VendorId,
                 OutletId = pointDto.OutletId,
-                Point = pointDto.Point,
+                Points = pointDto.Point,
                 Level = pointDto.Level,
                 LastUpdatedOn = pointDto.LastUpdatedOn
             };
@@ -42,7 +42,7 @@ namespace api.Mappers
                 RewardId = pointModel.RewardId,
                 VendorId = pointModel.VendorId,
                 OutletId = pointModel.OutletId,
-                Point = pointModel.Point,
+                Point = pointModel.Points,
                 Level = pointModel.Level,
                 LastUpdatedOn = pointModel.LastUpdatedOn
             };

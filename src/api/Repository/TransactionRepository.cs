@@ -44,6 +44,12 @@ namespace api.Repository
                 transactions = transactions.Where(t => t.CreatedOn == query.CreatedDate);
             }
 
+            if (query.IsLatest == true)
+            {
+                DateTime defaultStartDate = DateTime.UtcNow.AddDays(-30);
+                transactions = transactions.Where(t => t.CreatedOn <= defaultStartDate);
+            }
+
             var skipNumber = (query.PageNumber - 1) * query.PageSize;
             return await transactions
                 .Skip(skipNumber)

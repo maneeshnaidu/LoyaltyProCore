@@ -17,21 +17,18 @@ using Microsoft.Extensions.Logging;
 namespace api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/rewards")]
     public class RewardController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
         private readonly IRewardRepository _rewardRepository;
         private readonly IVendorRepository _vendorRepository;
         private readonly ILogger<RewardController> _logger;
 
         public RewardController(
-            ApplicationDBContext context,
             IRewardRepository rewardRepository,
             IVendorRepository vendorRepository,
             ILogger<RewardController> logger)
         {
-            _context = context;
             _rewardRepository = rewardRepository;
             _vendorRepository = vendorRepository;
             _logger = logger;

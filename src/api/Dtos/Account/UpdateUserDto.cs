@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace api.Dtos.Account
 {
-    public class RegisterDto
+    public class UpdateUserDto
     {
         [Required]
         public required string FirstName { get; set; }
@@ -16,9 +16,8 @@ namespace api.Dtos.Account
         [Required]
         [EmailAddress]
         public required string Email { get; set; }
-        [Required]
-        public required string Password { get; set; }
         public int? VendorId { get; set; }
-        public string? Role { get; set; }
+        public string Roles { get; set; } = string.Empty;
+
     }
 }

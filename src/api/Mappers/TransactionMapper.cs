@@ -15,11 +15,11 @@ namespace api.Mappers
             return new TransactionDto
             {
                 Id = transactionModel.Id,
-                CustomerId = transactionModel.CustomerId,
-                OrderId = transactionModel.OrderId,
+                Customer = transactionModel.Customer,
+                OrderNumber = transactionModel.OrderNumber,
+                OutletAddress = transactionModel.OutletAddress,
                 Points = transactionModel.Points,
                 TransactionType = transactionModel.TransactionType,
-                OutletId = transactionModel.OutletId,
                 CreatedOn = transactionModel.CreatedOn
             };
         }

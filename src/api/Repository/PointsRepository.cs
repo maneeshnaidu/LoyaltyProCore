@@ -14,14 +14,18 @@ namespace api.Repository
         private readonly ApplicationDBContext _context;
         private readonly ITransactionsRepository _transactionsRepository;
         private readonly IRewardRepository _rewardRepository;
+        private readonly IUserService _userService;
 
         public PointsRepository(ApplicationDBContext context,
             ITransactionsRepository transactionsRepository,
-            IRewardRepository rewardRepository)
+            IRewardRepository rewardRepository,
+            IUserService userService
+            )
         {
             _context = context;
             _transactionsRepository = transactionsRepository;
             _rewardRepository = rewardRepository;
+            _userService = userService;
         }
 
         public async Task<RewardPoints> CreateAsync(RewardPoints model)
@@ -33,11 +37,13 @@ namespace api.Repository
             var transaction = new PointsTransaction
             {
                 CustomerId = model.CustomerId,
-                OrderId = null,
-                Points = model.Point,
+                Customer = await _userService.GetUsernameByIdAsync(model.CustomerId),
+                StaffId = model.StaffId,
+                AddedBy = await _userService.GetUsernameByIdAsync(model.StaffId),
+                OrderId = model.OrderId,
+                Points = model.Points,
                 TransactionType = "EarnedPoints", // Example transaction type
-                OutletId = model.OutletId,
-                CreatedOn = DateTime.UtcNow // Set the created date to now
+                OutletId = model.OutletId
             };
             await _transactionsRepository.CreateAsync(transaction);
 
@@ -46,7 +52,7 @@ namespace api.Repository
             if (reward != null)
             {
                 // Add customer rewards based on points
-                if (model.Point >= reward.PointsRequired)
+                if (model.Points >= reward.PointsRequired)
                 {
                     await _rewardRepository.AddRewardAsync(model);
                 }
@@ -105,20 +111,17 @@ namespace api.Repository
             return await _context.RewardPoints.AnyAsync(x => x.Id == id);
         }
 
-        public async Task<RewardPoints?> UpdateAsync(int id, UpsertPointsDto pointsDto)
+        public async Task<RewardPoints?> UpdateAsync(UpsertPointsDto pointsDto)
         {
-            var existingPoints = await _context.RewardPoints.FirstOrDefaultAsync(x => x.Id == id);
+            var existingPoints = await _context.RewardPoints
+                .FirstOrDefaultAsync(r => r.RewardId == pointsDto.RewardId && r.CustomerId == pointsDto.CustomerId);
             if (existingPoints == null)
             {
                 return null;
             }
-            existingPoints.CustomerId = pointsDto.CustomerId;
-            existingPoints.RewardId = pointsDto.RewardId;
-            existingPoints.VendorId = pointsDto.VendorId;
-            existingPoints.OutletId = pointsDto.OutletId;
-            existingPoints.Point = pointsDto.Point;
+            existingPoints.Points += 1;
             existingPoints.Level = pointsDto.Level;
-            existingPoints.LastUpdatedOn = DateTime.Now;
+            existingPoints.LastUpdatedOn = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
             return existingPoints;
