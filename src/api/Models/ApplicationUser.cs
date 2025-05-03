@@ -5,7 +5,7 @@ namespace api.Models
     public class ApplicationUser : IdentityUser
     {
         public int UserCode { get; set; }
-        public string FirstName { get; set; } = string.Empty;
+        public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public int? VendorId { get; set; }
         public int? OutletId { get; set; }

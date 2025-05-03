@@ -90,7 +90,12 @@ namespace api.Repository
                 return null;
             }
 
+            existingOutlet.Name = outletDto.Name;
+            existingOutlet.Description = outletDto.Description;
+            existingOutlet.Category = outletDto.Category;
             existingOutlet.Address = outletDto.Address;
+            existingOutlet.PhoneNumber = outletDto.PhoneNumber;
+            existingOutlet.CoverImageUrl = outletDto.CoverImageUrl;
             existingOutlet.IsActive = outletDto.IsActive;
             existingOutlet.UpdatedOn = DateTime.UtcNow;
 

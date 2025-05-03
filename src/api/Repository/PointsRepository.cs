@@ -123,6 +123,19 @@ namespace api.Repository
             existingPoints.Level = pointsDto.Level;
             existingPoints.LastUpdatedOn = DateTime.UtcNow;
 
+            // Add a record to the PointsTransaction table
+            var transaction = new PointsTransaction
+            {
+                CustomerId = pointsDto.CustomerId,
+                Customer = await _userService.GetUsernameByIdAsync(pointsDto.CustomerId),
+                StaffId = pointsDto.StaffId,
+                AddedBy = await _userService.GetUsernameByIdAsync(pointsDto.StaffId),
+                OrderId = pointsDto.OrderId,
+                Points = pointsDto.Point,
+                TransactionType = "EarnedPoints", // Example transaction type
+                OutletId = pointsDto.OutletId
+            };
+            await _transactionsRepository.CreateAsync(transaction);
             await _context.SaveChangesAsync();
             return existingPoints;
         }

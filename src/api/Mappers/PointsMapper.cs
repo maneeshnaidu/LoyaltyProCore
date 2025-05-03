@@ -28,6 +28,7 @@ namespace api.Mappers
                 RewardId = pointDto.RewardId,
                 VendorId = pointDto.VendorId,
                 OutletId = pointDto.OutletId,
+                StaffId = pointDto.StaffId,
                 Points = pointDto.Point,
                 Level = pointDto.Level,
                 LastUpdatedOn = pointDto.LastUpdatedOn
@@ -42,6 +43,7 @@ namespace api.Mappers
                 RewardId = pointModel.RewardId,
                 VendorId = pointModel.VendorId,
                 OutletId = pointModel.OutletId,
+                StaffId = pointModel.StaffId,
                 Point = pointModel.Points,
                 Level = pointModel.Level,
                 LastUpdatedOn = pointModel.LastUpdatedOn

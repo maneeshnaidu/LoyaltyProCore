@@ -71,6 +71,7 @@ namespace api.Services
             var usersQuery = _userManager.Users.AsQueryable();
 
             // Filter by Role if provided
+
             if (!string.IsNullOrEmpty(query.Role))
             {
                 // Get users in the specified role
@@ -88,10 +89,10 @@ namespace api.Services
             return await usersQuery.ToListAsync();
         }
 
-        public async Task<string> GetUsernameByIdAsync(string id)
+        public async Task<string?> GetUsernameByIdAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            return user?.FirstName + " " + user?.LastName;
+            return user?.UserName;
         }
     }
 }

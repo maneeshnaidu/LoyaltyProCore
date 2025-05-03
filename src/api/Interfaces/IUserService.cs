@@ -13,7 +13,7 @@ namespace api.Interfaces
         Task<List<ApplicationUser?>> GetAllAsync(QueryObject query);
         Task<ApplicationUser?> GetUserByUserCodeAsync(int userCode);
         Task<ApplicationUser?> GetUserByUserNameAsync(string userName);
-        Task<string> GetUsernameByIdAsync(string id);
+        Task<string?> GetUsernameByIdAsync(string id);
         Task<int?> GetVendorByIdAsync(string id);
         Task<int> GenerateUserCodeAsync();
         Task<int> GenerateAdminUserCodeAsync();

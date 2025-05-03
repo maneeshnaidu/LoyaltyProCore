@@ -12,7 +12,7 @@ namespace api.Models
         public string CoverImageUrl { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; }
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }
         public string? PhoneNumber { get; set; }

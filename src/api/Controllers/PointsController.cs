@@ -50,7 +50,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        // [Authorize]
+        [Authorize]
         [Route("{customerCode:int}")]
         public async Task<IActionResult> AddPoints([FromRoute] int customerCode, UpsertPointsDto pointsDto)
         {
@@ -63,6 +63,11 @@ namespace api.Controllers
             if (customer != null)
             {
                 pointsDto.CustomerId = customer.Id;
+            }
+
+            if (appUser != null)
+            {
+                pointsDto.StaffId = appUser.Id;
             }
             var reward = await _rewardRepository.GetByIdAsync(pointsDto.RewardId);
             if (appUser == null || customer == null) return BadRequest("User not found");

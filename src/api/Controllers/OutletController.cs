@@ -12,21 +12,21 @@ namespace api.Controllers
     [Route("api/outlets")]
     public class OutletController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
         private readonly IOutletRepository _outletRepository;
         private readonly IVendorRepository _vendorRepository;
+        private readonly IUploadFileService _uploadFileService;
         private readonly IUserService _userService;
         public OutletController(
-            ApplicationDBContext context,
             IOutletRepository outletRepository,
             IVendorRepository vendorRepository,
+            IUploadFileService uploadFileService,
             IUserService userService
             )
         {
             _outletRepository = outletRepository;
             _vendorRepository = vendorRepository;
+            _uploadFileService = uploadFileService;
             _userService = userService;
-            _context = context;
         }
 
         [HttpGet]
@@ -71,14 +71,31 @@ namespace api.Controllers
                 return BadRequest("Admin user not found");
             }
 
-            var vendor = await _vendorRepository.GetByAdminAsync(adminUser.Id);
-            if (vendor == null)
-            {
-                return BadRequest("Vendor does not exist");
-            }
+            // var vendor = await _vendorRepository.GetByAdminAsync(adminUser.Id);
+            // if (vendor == null)
+            // {
+            //     return BadRequest("Vendor does not exist");
+            // }
 
             var outletModel = outletDto.ToOutletFromCreateDto();
-            outletModel.VendorId = vendor.Id;
+            // Upload images if provided
+            try
+            {
+                if (outletDto.CoverImage != null)
+                {
+                    var uploadCover = await _uploadFileService.UploadFileAsync(outletDto.CoverImage);
+                    outletModel.CoverImageUrl = uploadCover.Url;
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while uploading the file... " + ex);
+            }
+            // outletModel.VendorId = vendor.Id;
             await _outletRepository.CreateAsync(outletModel);
             return CreatedAtAction(nameof(GetById), new { id = outletModel.Id }, outletModel.ToOutletDto());
         }
@@ -91,14 +108,33 @@ namespace api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var outletModel = await _outletRepository.UpdateAsync(id, updateDto);
-
-            if (outletModel == null)
+            if (await _outletRepository.OutletExists(id))
             {
-                return NotFound();
-            }
+                // Upload images if provided
+                try
+                {
+                    if (updateDto.CoverImage != null)
+                    {
+                        var uploadCover = await _uploadFileService.UploadFileAsync(updateDto.CoverImage);
+                        updateDto.CoverImageUrl = uploadCover.Url;
+                    }
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "An error occurred while uploading the file... " + ex);
+                }
 
-            return Ok(outletModel.ToOutletDto());
+                var outletModel = await _outletRepository.UpdateAsync(id, updateDto);
+                return outletModel == null ? NotFound() : Ok(outletModel.ToOutletDto());
+            }
+            else
+            {
+                return NotFound("Outlet not found.");
+            }
         }
 
         [HttpDelete]

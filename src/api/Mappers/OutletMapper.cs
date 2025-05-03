@@ -10,10 +10,15 @@ namespace api.Mappers
             return new OutletDto
             {
                 Id = outletModel.Id,
-                Address = outletModel.Address,
                 VendorId = outletModel.VendorId,
+                Name = outletModel.Name,
+                Description = outletModel.Description,
+                Category = outletModel.Category,
+                CoverImageUrl = outletModel.CoverImageUrl,
+                Address = outletModel.Address,
                 IsActive = outletModel.IsActive,
                 CreatedOn = outletModel.CreatedOn,
+                UpdatedOn = outletModel.UpdatedOn,
             };
         }
 
@@ -21,6 +26,11 @@ namespace api.Mappers
         {
             return new Outlet
             {
+                VendorId = outletDto.VendorId,
+                Name = outletDto.Name,
+                Description = outletDto.Description,
+                Category = outletDto.Category,
+                CoverImageUrl = outletDto.CoverImageUrl,
                 Address = outletDto.Address,
                 IsActive = outletDto.IsActive,
             };

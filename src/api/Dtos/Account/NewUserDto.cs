@@ -7,7 +7,7 @@ namespace api.Dtos.Account
 {
     public class NewUserDto
     {
-        public required string FirstName { get; set; }
+        public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public required string UserName { get; set; }
         public int UserCode { get; set; }
