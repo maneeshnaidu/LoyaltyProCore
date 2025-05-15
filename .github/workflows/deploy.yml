@@ -10,7 +10,7 @@ env:
   REGISTRY: ${{ secrets.REGISTRY_LOGIN_SERVER }}
   IMAGE_NAME: loyaltypro-api
   RESOURCE_GROUP: LoyaltyProResources
-  WEBAPP_NAME: loyaltyprocore
+  WEBAPP_NAME: LoyaltyProCore
 
 jobs:
   build-and-deploy:
@@ -39,6 +39,6 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: $WEBAPP_NAME
+          app-name: ${{ env.WEBAPP_NAME }}
           # resource-group: $RESOURCE_GROUP
           images: "$REGISTRY/$IMAGE_NAME:${{ github.sha }}"
