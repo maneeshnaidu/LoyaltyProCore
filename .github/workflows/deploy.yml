@@ -33,14 +33,14 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker pull ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker inspect ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.WEBAPP_NAME }}
           # resource-group: $RESOURCE_GROUP
-          images: "${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          images: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
           # Add these critical parameters:
           configuration-file: ./deploymentSettings.json
