@@ -1,0 +1,10 @@
+{
+    "linuxFxVersion": "DOCKER|loyaltyproregistry.azurecr.io/loyaltypro-api:latest",
+    "appCommandLine": "dotnet api.dll",
+    "appSettings": [
+      {
+        "name": "WEBSITES_PORT",
+        "value": "8080"
+      }
+    ]
+  }
