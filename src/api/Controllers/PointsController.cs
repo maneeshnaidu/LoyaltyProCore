@@ -90,17 +90,17 @@ namespace api.Controllers
 
         [HttpDelete]
         [Authorize]
-        [Route("{rewardId:int}/{customerCode:int}")]
-        public async Task<IActionResult> RedeemReward([FromRoute] int rewardId, int customerCode)
+        [Route("{rewardId:int}")]
+        public async Task<IActionResult> RedeemReward([FromRoute] int rewardId)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var model = await _rewardRepository.RedeemRewardAsync(rewardId, customerCode);
+            var model = await _rewardRepository.RedeemRewardAsync(rewardId);
 
             if (model == null)
             {
-                return NotFound();
+                return NotFound("No rewards available for user.");
             }
 
             return NoContent();

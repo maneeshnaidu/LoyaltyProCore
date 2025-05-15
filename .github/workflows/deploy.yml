@@ -1,0 +1,44 @@
+name: Build and Deploy .NET 8 API
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+env:
+  REGISTRY: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+  IMAGE_NAME: loyaltypro-api
+  RESOURCE_GROUP: LoyaltyProResources
+  WEBAPP_NAME: loyaltyprocore
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAME:${{ github.sha }} .
+          docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: $WEBAPP_NAME
+          # resource-group: $RESOURCE_GROUP
+          images: "$REGISTRY/$IMAGE_NAME:${{ github.sha }}"

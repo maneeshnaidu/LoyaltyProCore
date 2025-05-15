@@ -119,7 +119,7 @@ namespace api.Repository
             {
                 return null;
             }
-            existingPoints.Points += 1;
+            existingPoints.Points += pointsDto.Point;
             existingPoints.Level = pointsDto.Level;
             existingPoints.LastUpdatedOn = DateTime.UtcNow;
 
@@ -136,8 +136,34 @@ namespace api.Repository
                 OutletId = pointsDto.OutletId
             };
             await _transactionsRepository.CreateAsync(transaction);
+
+            // Check and update the RewardsRepository
+            var reward = await _rewardRepository.GetByIdAsync(existingPoints.RewardId);
+            if (reward != null)
+            {
+                // Add customer rewards based on points
+                if (existingPoints.Points >= reward.PointsRequired)
+                {
+                    existingPoints.Points -= reward.PointsRequired;
+                    await _rewardRepository.AddRewardAsync(existingPoints);
+                }
+            }
             await _context.SaveChangesAsync();
             return existingPoints;
+        }
+
+        public async Task<List<Reward>> GetUserRewards(ApplicationUser user)
+        {
+            var customerRewards = _context.CustomerRewards.AsQueryable();
+            if (customerRewards != null)
+            {
+                customerRewards = customerRewards.Where(cr => cr.CustomerId == user.Id);
+                var rewardIds = customerRewards.Select(cr => cr.RewardId); // Get the reward IDs
+                var rewards = _context.Rewards.Where(r => rewardIds.Contains(r.Id)); // Filter rewards by IDs
+                return await rewards.ToListAsync();
+            }
+
+            return [];
         }
     }
 }

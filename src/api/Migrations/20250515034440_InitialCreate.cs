@@ -202,7 +202,7 @@ namespace api.Migrations
                     CoverImageUrl = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Latitude = table.Column<string>(type: "text", nullable: true),
                     Longitude = table.Column<string>(type: "text", nullable: true),
                     PhoneNumber = table.Column<string>(type: "text", nullable: true)
@@ -281,7 +281,7 @@ namespace api.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     UserCode = table.Column<int>(type: "integer", nullable: false),
-                    FirstName = table.Column<string>(type: "text", nullable: false),
+                    FirstName = table.Column<string>(type: "text", nullable: true),
                     LastName = table.Column<string>(type: "text", nullable: true),
                     VendorId = table.Column<int>(type: "integer", nullable: true),
                     OutletId = table.Column<int>(type: "integer", nullable: true),
@@ -487,10 +487,10 @@ namespace api.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1dd17b53-e620-4590-a810-9e49a64bdef5", null, "User", "USER" },
-                    { "d32bb953-8b67-4c00-adff-1d229697a938", null, "SuperAdmin", "SUPERADMIN" },
-                    { "f691cfc4-31ca-46b9-bc03-00dbaae0bad2", null, "Admin", "ADMIN" },
-                    { "fe3e9843-9363-4071-9b0d-e0a65b80a0df", null, "Staff", "STAFF" }
+                    { "2375c89f-7857-4078-a96c-0bc616423c72", null, "User", "USER" },
+                    { "4c2dbfe7-4cc2-4dda-8bcb-8134d7b24eac", null, "SuperAdmin", "SUPERADMIN" },
+                    { "9cd12acf-5a09-4192-9c6b-66fc2b2c69f8", null, "Staff", "STAFF" },
+                    { "fa4accf7-6a8f-4369-867a-999419413419", null, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(

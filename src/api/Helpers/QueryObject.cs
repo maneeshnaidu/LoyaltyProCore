@@ -9,6 +9,7 @@ namespace api.Helpers
     {
         public string? CustomerId { get; set; }
         public string? Role { get; set; } = null;
+        public int? UserCode { get; set; } = null;
         public int? VendorId { get; set; } = null;
         public int? OutletId { get; set; } = null;
         public string? Category { get; set; } = null;

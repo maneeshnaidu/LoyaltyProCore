@@ -43,6 +43,18 @@ namespace api.Repository
         {
             var rewards = _context.Rewards.AsQueryable();
 
+            // Filter by UserCode if provided
+            if (query.UserCode.HasValue)
+            {
+                var user = await _userService.GetUserByUserCodeAsync(query.UserCode.Value);
+                if (user != null)
+                {
+                    var customerRewards = _context.CustomerRewards.Where(r => r.CustomerId == user.Id);
+                    var rewardIds = customerRewards.Select(cr => cr.RewardId); // Get the reward IDs
+                    rewards = rewards.Where(r => rewardIds.Contains(r.Id)); // Filter rewards based on the reward IDs
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(query.Title))
             {
                 rewards = rewards.Where(x => x.Title.Contains(query.Title));
@@ -105,27 +117,17 @@ namespace api.Repository
             return reward;
         }
 
-        public async Task<CustomerRewards?> RedeemRewardAsync(int rewardId, int customerCode)
+        public async Task<CustomerRewards?> RedeemRewardAsync(int rewardId)
         {
-            var user = await _userService.GetUserByUserCodeAsync(customerCode);
-            if (user != null)
-            {
-                var model = await _context.CustomerRewards.FirstOrDefaultAsync(x => x.Id == rewardId
-                && x.CustomerId == user.Id);
-
-                if (model == null)
-                {
-                    return null;
-                }
-
-                _context.CustomerRewards.Remove(model);
-                await _context.SaveChangesAsync();
-                return model;
-            }
-            else
+            var model = await _context.CustomerRewards.FirstOrDefaultAsync(x => x.Id == rewardId);
+            if (model == null)
             {
                 return null;
             }
+
+            _context.CustomerRewards.Remove(model);
+            await _context.SaveChangesAsync();
+            return model;
 
         }
     }

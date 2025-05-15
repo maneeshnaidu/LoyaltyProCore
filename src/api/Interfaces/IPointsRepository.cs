@@ -14,6 +14,7 @@ namespace api.Interfaces
         Task<List<RewardPoints>> GetAllAsync(QueryObject query);
         Task<RewardPoints?> GetByIdAsync(int id);
         Task<List<RewardPoints>> GetUserPoints(ApplicationUser user);
+        Task<List<Reward>> GetUserRewards(ApplicationUser user);
         Task<RewardPoints?> GetUserPointsByVendor(string customerId, int vendorId);
         Task<RewardPoints?> GetUserPointsByReward(string customerId, int rewardId);
         Task<RewardPoints> CreateAsync(RewardPoints pointsModel);

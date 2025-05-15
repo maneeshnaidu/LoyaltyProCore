@@ -10,7 +10,7 @@ namespace api.Interfaces
 {
     public interface IUserService
     {
-        Task<List<ApplicationUser?>> GetAllAsync(QueryObject query);
+        Task<List<ApplicationUser>> GetAllAsync(QueryObject query);
         Task<ApplicationUser?> GetUserByUserCodeAsync(int userCode);
         Task<ApplicationUser?> GetUserByUserNameAsync(string userName);
         Task<string?> GetUsernameByIdAsync(string id);
