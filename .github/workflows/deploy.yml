@@ -11,6 +11,7 @@ env:
   IMAGE_NAME: loyaltypro-api
   RESOURCE_GROUP: LoyaltyProResources
   WEBAPP_NAME: LoyaltyProCore
+  ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
 
 jobs:
   build-and-deploy:
