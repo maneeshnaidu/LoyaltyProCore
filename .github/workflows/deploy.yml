@@ -3,12 +3,8 @@ name: Build and Deploy .NET 8 API
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
 
 env:
-  REGISTRY: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-  IMAGE_NAME: loyaltypro-api
   RESOURCE_GROUP: LoyaltyProResources
   WEBAPP_NAME: LoyaltyProCore
   ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
@@ -30,26 +26,17 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Login to ACR
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - name: Build and push Docker image
+      - name: Build Docker image
         run: |
-          run: |
-          docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            --build-arg DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }} .
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker build -t ${{ env.WEBAPP_NAME }}:${{ github.sha }} .
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.WEBAPP_NAME }}
           # resource-group: $RESOURCE_GROUP
-          images: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          images: "${{ env.WEBAPP_NAME }}:${{ github.sha }}"
+          configuration-file: ./azure-app-settings.json
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
-          ASPNETCORE_ENVIRONMENT: Production
+          ASPNETCORE_ENVIRONMENT: "Production"
