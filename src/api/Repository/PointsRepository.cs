@@ -37,9 +37,9 @@ namespace api.Repository
             var transaction = new PointsTransaction
             {
                 CustomerId = model.CustomerId,
-                Customer = await _userService.GetUsernameByIdAsync(model.CustomerId),
+                Customer = await _userService.GetUsernameByIdAsync(model.CustomerId) ?? string.Empty,
                 StaffId = model.StaffId,
-                AddedBy = await _userService.GetUsernameByIdAsync(model.StaffId),
+                AddedBy = await _userService.GetUsernameByIdAsync(model.StaffId) ?? string.Empty,
                 OrderId = model.OrderId,
                 Points = model.Points,
                 TransactionType = "EarnedPoints", // Example transaction type
@@ -127,9 +127,9 @@ namespace api.Repository
             var transaction = new PointsTransaction
             {
                 CustomerId = pointsDto.CustomerId,
-                Customer = await _userService.GetUsernameByIdAsync(pointsDto.CustomerId),
+                Customer = await _userService.GetUsernameByIdAsync(pointsDto.CustomerId) ?? string.Empty,
                 StaffId = pointsDto.StaffId,
-                AddedBy = await _userService.GetUsernameByIdAsync(pointsDto.StaffId),
+                AddedBy = await _userService.GetUsernameByIdAsync(pointsDto.StaffId) ?? string.Empty,
                 OrderId = pointsDto.OrderId,
                 Points = pointsDto.Point,
                 TransactionType = "EarnedPoints", // Example transaction type
