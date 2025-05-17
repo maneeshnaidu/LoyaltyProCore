@@ -7,6 +7,8 @@ on:
 env:
   AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
   RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  PROJECT_PATH: src/api/api.csproj
+  PUBLISH_PATH: ./publish
 
 jobs:
   build-and-deploy:
@@ -20,16 +22,27 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      # Build and publish
+      # Build and publish from the correct project path
       - name: Build with dotnet
         run: |
-          dotnet restore
-          dotnet build --configuration Release --no-restore
-          dotnet publish -c Release -o ./publish
+          dotnet restore ${{ env.PROJECT_PATH }}
+          dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+          dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }}
 
+      # Inject DB connection string (alternative to Azure App Settings)
       - name: Add DB Connection String
         run: |
-          echo "ConnectionStrings__DefaultConnection=${{ secrets.DB_CONNECTION_STRING }}" >> ./publish/appsettings.Production.json
+          echo "{
+            \"ConnectionStrings\": {
+              \"DefaultConnection\": \"${{ secrets.DB_CONNECTION_STRING }}\"
+            },
+            \"Logging\": {
+              \"LogLevel\": {
+                \"Default\": \"Information\",
+                \"Microsoft.AspNetCore\": \"Warning\"
+              }
+            }
+          }" > ${{ env.PUBLISH_PATH }}/appsettings.Production.json
 
       # Azure Login
       - name: Azure Login
@@ -42,4 +55,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ./publish
+          package: ${{ env.PUBLISH_PATH }}
