@@ -12,6 +12,11 @@ env:
   RESOURCE_GROUP: LoyaltyProResources
   WEBAPP_NAME: LoyaltyProCore
   ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
+  Cloudinary__ApiKey: ${{ secrets.CLOUDINARY_API_KEY }}
+  Cloudinary__ApiSecret: ${{ secrets.CLOUDINARY_API_SECRET }}
+  JWT__SigningKey: ${{ secrets.JWT_SIGNING_KEY }}
+  JWT__Issuer: "loyaltyprocore.azurewebsites.net"
+  JWT__Audience: "loyaltyprocore.azurewebsites.net"
 
 jobs:
   build-and-deploy:

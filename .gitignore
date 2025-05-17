@@ -213,7 +213,6 @@ PublishScripts/
 *.nuget.targets
 
 #Configuration
-*appsettings.json
 *appsettings.Development.json
 *appsettings.Production.json
 # Microsoft Azure Build Output

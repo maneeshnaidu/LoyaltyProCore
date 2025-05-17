@@ -20,7 +20,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Expose the port the app runs on
-EXPOSE 8080
+EXPOSE 80
 EXPOSE 443
 
 # Set the entry point for the container
