@@ -5,8 +5,8 @@ on:
     branches: ["main"]
 
 env:
-  RESOURCE_GROUP: LoyaltyProResources
-  WEBAPP_NAME: loyaltyprocore
+  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
   ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
   Cloudinary__ApiKey: ${{ secrets.CLOUDINARY_API_KEY }}
   Cloudinary__ApiSecret: ${{ secrets.CLOUDINARY_API_SECRET }}
