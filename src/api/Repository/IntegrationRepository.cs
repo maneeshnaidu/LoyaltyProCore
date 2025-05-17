@@ -56,7 +56,7 @@ namespace api.Repository
             return await integrations.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 
-        public async Task<VendorIntegration?> GetByIdAsync(int id, string category)
+        public async Task<VendorIntegration?> GetByIdAsync(int id, string? category)
         {
             return !string.IsNullOrEmpty(category)
                 ? await _context.VendorIntegrations
