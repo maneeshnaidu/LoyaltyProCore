@@ -1,42 +1,45 @@
-name: Build and Deploy .NET 8 API
+name: Deploy .NET 8 to Azure
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
 
 env:
+  AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
   RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-  WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
-  ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
-  Cloudinary__ApiKey: ${{ secrets.CLOUDINARY_API_KEY }}
-  Cloudinary__ApiSecret: ${{ secrets.CLOUDINARY_API_SECRET }}
-  JWT__SigningKey: ${{ secrets.JWT_SIGNING_KEY }}
-  JWT__Issuer: "loyaltyprocore.azurewebsites.net"
-  JWT__Audience: "loyaltyprocore.azurewebsites.net"
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to Azure
+      # Setup .NET 8
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.x"
+
+      # Build and publish
+      - name: Build with dotnet
+        run: |
+          dotnet restore
+          dotnet build --configuration Release --no-restore
+          dotnet publish -c Release -o ./publish
+
+      - name: Add DB Connection String
+        run: |
+          echo "ConnectionStrings__DefaultConnection=${{ secrets.DB_CONNECTION_STRING }}" >> ./publish/appsettings.Production.json
+
+      # Azure Login
+      - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Build Docker image
-        run: |
-          docker build -t ${{ env.WEBAPP_NAME }}:${{ github.sha }} .
-
-      - name: Deploy to Azure Web App
+      # Deploy to Azure (Zip Deploy)
+      - name: Run Azure webapp deploy
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.WEBAPP_NAME }}
-          # resource-group: $RESOURCE_GROUP
-          images: "${{ env.WEBAPP_NAME }}:${{ github.sha }}"
-          configuration-file: ./azure-app-settings.json
-        env:
-          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
-          ASPNETCORE_ENVIRONMENT: "Production"
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: ./publish
