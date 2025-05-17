@@ -48,8 +48,7 @@ namespace api.Controllers
 
             var vendorDtos = vendors.Select(v => v.ToVendorDto()).ToList();
 
-            // return Ok(vendorDtos);
-            return Ok("Test");
+            return Ok(vendorDtos);
         }
 
         [HttpGet("{id:int}")]
