@@ -48,3 +48,5 @@ jobs:
           app-name: ${{ env.WEBAPP_NAME }}
           # resource-group: $RESOURCE_GROUP
           images: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}

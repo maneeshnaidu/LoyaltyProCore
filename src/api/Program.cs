@@ -48,7 +48,8 @@ builder.Services.AddSwaggerGen(option =>
 // Add DBContext
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") ??
+        throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
 });
 
 // Add Identity
