@@ -6,7 +6,7 @@ on:
 
 env:
   RESOURCE_GROUP: LoyaltyProResources
-  WEBAPP_NAME: LoyaltyProCore
+  WEBAPP_NAME: loyaltyprocore
   ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
   Cloudinary__ApiKey: ${{ secrets.CLOUDINARY_API_KEY }}
   Cloudinary__ApiSecret: ${{ secrets.CLOUDINARY_API_SECRET }}
