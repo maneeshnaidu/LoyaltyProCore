@@ -1,58 +1,42 @@
-name: Deploy .NET 8 to Azure
+name: Deploy to Render
 
 on:
   push:
     branches: [main]
 
 env:
-  AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
-  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-  PROJECT_PATH: src/api/api.csproj
-  PUBLISH_PATH: ./publish
+  RENDER_SERVICE_NAME: plum-api
+  DOTNET_VERSION: "8.0.x"
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # Setup .NET 8
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      # Build and publish from the correct project path
-      - name: Build with dotnet
+      - name: Build
         run: |
-          dotnet restore ${{ env.PROJECT_PATH }}
-          dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
-          dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }}
+          dotnet restore src/api/api.csproj
+          dotnet build src/api/api.csproj -c Release --no-restore
 
-      # Inject DB connection string (alternative to Azure App Settings)
-      - name: Add DB Connection String
+      - name: Test
         run: |
-          echo "{
-            \"ConnectionStrings\": {
-              \"DefaultConnection\": \"${{ secrets.DB_CONNECTION_STRING }}\"
-            },
-            \"Logging\": {
-              \"LogLevel\": {
-                \"Default\": \"Information\",
-                \"Microsoft.AspNetCore\": \"Warning\"
-              }
-            }
-          }" > ${{ env.PUBLISH_PATH }}/appsettings.Production.json
+          dotnet test src/api/api.csproj
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
 
-      # Azure Login
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Install Render CLI
+        run: npm install -g @renderinc/cli
 
-      # Deploy to Azure (Zip Deploy)
-      - name: Run Azure webapp deploy
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ${{ env.PUBLISH_PATH }}
+      - name: Deploy to Render
+        run: |
+          render deploy \
+            --api-key ${{ secrets.RENDER_API_KEY }} \
+            --service ${{ env.RENDER_SERVICE_NAME }} \
+            --envVars DATABASE_URL=${{ secrets.DB_CONNECTION_STRING }} \
+            --auto-create
