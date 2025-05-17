@@ -52,4 +52,4 @@ jobs:
           images: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
-          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+          ASPNETCORE_ENVIRONMENT: Production

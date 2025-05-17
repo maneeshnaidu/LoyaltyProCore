@@ -19,6 +19,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
+# Connection string will be injected at runtime
+ENV ConnectionStrings__DefaultConnection=""
+
 # Expose the port the app runs on
 EXPOSE 8080
 EXPOSE 80
