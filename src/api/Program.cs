@@ -142,7 +142,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging() || app.Enviro
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.MapControllers();
 }
 
 using (var scope = app.Services.CreateScope())
@@ -160,12 +159,14 @@ app.UseCors(x => x
      .AllowAnyMethod()
      .AllowAnyHeader()
      .AllowCredentials()
-      .WithOrigins("http://localhost:3000")
+      //   .WithOrigins("http://localhost:3000")
       .SetIsOriginAllowed(origin => true));
 
 // Add Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
 
