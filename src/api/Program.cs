@@ -10,15 +10,8 @@ using Microsoft.OpenApi.Models;
 using api.Services;
 using CloudinaryDotNet;
 using api.Helpers;
-using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add this for Render + Cloudflare compatibility
-builder.WebHost.ConfigureKestrel(options => options.AllowSynchronousIO = true);
-
-// Add forwarded headers middleware
-builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.All);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
