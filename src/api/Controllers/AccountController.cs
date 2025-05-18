@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api/account")]
+    [Route("api/auth")]
     public class AccountController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
