@@ -13,6 +13,14 @@ using api.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Added for Render deployment
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
+
+// Add health checks
+builder.Services.AddHealthChecks();
+
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -137,7 +145,7 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
-app.UseForwardedHeaders();
+app.UseRouting();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
