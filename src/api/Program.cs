@@ -143,6 +143,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
 });
 
+
+
+
 var app = builder.Build();
 
 app.UseRouting();

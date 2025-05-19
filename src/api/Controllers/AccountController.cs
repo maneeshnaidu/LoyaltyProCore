@@ -63,8 +63,9 @@ namespace api.Controllers
                 {
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    UserName = user.UserName,
-                    Email = user.Email,
+                    UserName = user.UserName ?? string.Empty,
+                    Email = user.Email ?? string.Empty,
+                    UserCode = user.UserCode,
                     Vendor = user.VendorId,
                     Token = accessToken,
                     RefreshToken = refreshToken,
