@@ -46,7 +46,11 @@ namespace api.Controllers
             var appUser = await _userManager.FindByNameAsync(username);
             if (appUser == null) return BadRequest("User not found");
             var userPoints = await _pointsRepository.GetUserPoints(appUser);
-            return Ok(userPoints);
+
+            // Map each RewardPoints to LoyaltyCardDto
+            var loyaltyCards = userPoints.Select(p => p.ToLoyaltyCardDto()).ToList();
+
+            return Ok(loyaltyCards);
         }
 
         [HttpPost]

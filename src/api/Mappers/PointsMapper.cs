@@ -49,5 +49,19 @@ namespace api.Mappers
                 LastUpdatedOn = pointModel.LastUpdatedOn
             };
         }
+
+
+        public static LoyaltyCardDto ToLoyaltyCardDto(this RewardPoints pointModel)
+        {
+            return new LoyaltyCardDto
+            {
+                Id = pointModel.Id,
+                VendorId = pointModel.VendorId,
+                VendorName = pointModel.Vendor?.Name ?? string.Empty,
+                VendorLogo = pointModel.Vendor?.LogoImageUrl ?? string.Empty,
+                Points = pointModel.Points,
+                MaxPoints = pointModel.Reward?.PointsRequired ?? 0
+            };
+        }
     }
 }
