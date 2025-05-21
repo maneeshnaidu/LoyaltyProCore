@@ -16,14 +16,27 @@ namespace api.Repository
     public class TransactionRepository : ITransactionsRepository
     {
         private readonly ApplicationDBContext _context;
+        private readonly IOutletRepository _outletRepository;
         private readonly IUserService _userService;
-        public TransactionRepository(ApplicationDBContext context, IUserService userService)
+        public TransactionRepository(ApplicationDBContext context, IUserService userService,
+            IOutletRepository outletRepository
+        )
         {
             _context = context;
+            _outletRepository = outletRepository;
             _userService = userService;
         }
         public async Task<PointsTransaction> CreateAsync(PointsTransaction transaction)
         {
+            var outlet = await _outletRepository.GetByIdAsync(transaction.OutletId);
+            if (outlet == null)
+            {
+                throw new Exception("Outlet not found");
+            }
+            else
+            {
+                transaction.OutletAddress = outlet.Address;
+            }
             await _context.PointsTransactions.AddAsync(transaction);
             await _context.SaveChangesAsync();
             return transaction;

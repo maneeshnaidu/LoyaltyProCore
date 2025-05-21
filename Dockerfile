@@ -25,6 +25,7 @@ COPY --from=build /app/publish .
 
 # Expose the port your application listens on
 EXPOSE 8080
+# EXPOSE 80
 
 # Set the entry point for the container
 ENTRYPOINT ["dotnet", "api.dll"]

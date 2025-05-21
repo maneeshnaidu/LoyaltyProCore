@@ -160,7 +160,8 @@ namespace api.Repository
             var customerRewards = _context.CustomerRewards.AsQueryable();
             if (customerRewards != null)
             {
-                customerRewards = customerRewards.Where(cr => cr.CustomerId == user.Id);
+                customerRewards = customerRewards.Where(cr => cr.CustomerId == user.Id &&
+                    cr.RedeemedOn == null && cr.ExpiryDate > DateTime.UtcNow); // Filter by customer ID and redeemed status
                 var rewardIds = customerRewards.Select(cr => cr.RewardId); // Get the reward IDs
                 var rewards = _context.Rewards.Where(r => rewardIds.Contains(r.Id)); // Filter rewards by IDs
                 return await rewards.ToListAsync();

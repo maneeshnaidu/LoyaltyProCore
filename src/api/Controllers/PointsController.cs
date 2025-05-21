@@ -53,6 +53,19 @@ namespace api.Controllers
             return Ok(loyaltyCards);
         }
 
+        [HttpGet]
+        [Authorize]
+        [Route("{customerCode:int}")]
+        public async Task<IActionResult> GetUserRewards([FromRoute] int customerCode)
+        {
+            var appUser = await _userService.GetUserByUserCodeAsync(customerCode);
+            if (appUser == null) return BadRequest("User not found");
+
+            var rewards = await _pointsRepository.GetUserRewards(appUser);
+
+            return Ok(rewards);
+        }
+
         [HttpPost]
         [Authorize]
         [Route("{customerCode:int}")]
