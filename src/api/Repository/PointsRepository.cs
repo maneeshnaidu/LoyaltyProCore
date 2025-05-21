@@ -83,7 +83,10 @@ namespace api.Repository
 
         public async Task<List<RewardPoints>> GetUserPoints(ApplicationUser user)
         {
-            var points = _context.RewardPoints.AsQueryable();
+            var points = _context.RewardPoints
+                .Include(p => p.Reward)
+                .Include(p => p.Vendor)
+                .AsQueryable();
             if (user != null && user.StampCard != null && user.StampCard.Count > 0)
             {
                 points = points.Where(x => x.CustomerId == user.Id);
