@@ -61,7 +61,10 @@ namespace api.Controllers
             var appUser = await _userService.GetUserByUserCodeAsync(customerCode);
             if (appUser == null) return BadRequest("User not found");
 
-            var rewards = await _pointsRepository.GetUserRewards(appUser);
+            var customerRewards = await _pointsRepository.GetUserRewards(appUser);
+
+            // Map each CustomerRewards to RedeemableRewardDto
+            var rewards = customerRewards.Select(r => r.ToReedemableRewardFromCustomerRewardDto()).ToList();
 
             return Ok(rewards);
         }

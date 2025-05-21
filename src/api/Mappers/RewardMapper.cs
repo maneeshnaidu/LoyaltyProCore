@@ -34,5 +34,16 @@ namespace api.Mappers
                 IsActive = rewardModel.IsActive
             };
         }
+
+        public static RedeemableRewardDto ToReedemableRewardFromCustomerRewardDto(this CustomerRewards rewardModel)
+        {
+            return new RedeemableRewardDto
+            {
+                Id = rewardModel.Id,
+                Title = rewardModel.Reward?.Title ?? string.Empty,
+                Description = rewardModel.Reward?.Description ?? string.Empty,
+                ExpiryDate = rewardModel.ExpiryDate
+            };
+        }
     }
 }

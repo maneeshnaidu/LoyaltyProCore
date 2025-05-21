@@ -16,6 +16,7 @@ namespace api.Models
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public DateTime? RedeemedOn { get; set; }
         public DateTime ExpiryDate { get; set; } = DateTime.UtcNow.AddDays(180); // Default to 180 days from now
+        public Reward? Reward { get; set; } // Navigation property to the Reward entity
 
     }
 }
