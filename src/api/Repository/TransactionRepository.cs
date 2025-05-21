@@ -50,6 +50,11 @@ namespace api.Repository
                 transactions = transactions.Where(t => t.CreatedOn >= defaultStartDate);
             }
 
+            if (query.CustomerId != null)
+            {
+                transactions = transactions.Where(t => t.CustomerId == query.CustomerId);
+            }
+
             var skipNumber = (query.PageNumber - 1) * query.PageSize;
             return await transactions
                 .Skip(skipNumber)
