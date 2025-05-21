@@ -16,9 +16,11 @@ namespace api.Repository
     public class TransactionRepository : ITransactionsRepository
     {
         private readonly ApplicationDBContext _context;
-        public TransactionRepository(ApplicationDBContext context)
+        private readonly IUserService _userService;
+        public TransactionRepository(ApplicationDBContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
         public async Task<PointsTransaction> CreateAsync(PointsTransaction transaction)
         {
@@ -50,9 +52,13 @@ namespace api.Repository
                 transactions = transactions.Where(t => t.CreatedOn >= defaultStartDate);
             }
 
-            if (query.CustomerId != null)
+            if (query.UserCode != null)
             {
-                transactions = transactions.Where(t => t.CustomerId == query.CustomerId);
+                var user = await _userService.GetUserByUserCodeAsync(query.UserCode.Value);
+                if (user != null)
+                {
+                    transactions = transactions.Where(t => t.CustomerId == user.Id);
+                }
             }
 
             var skipNumber = (query.PageNumber - 1) * query.PageSize;
