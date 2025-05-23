@@ -29,26 +29,6 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerRewards",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CustomerId = table.Column<string>(type: "text", nullable: false),
-                    RewardId = table.Column<int>(type: "integer", nullable: false),
-                    VendorId = table.Column<int>(type: "integer", nullable: false),
-                    OutletId = table.Column<int>(type: "integer", nullable: true),
-                    ExternalId = table.Column<string>(type: "text", nullable: true),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    RedeemedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomerRewards", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "FavoriteOutlets",
                 columns: table => new
                 {
@@ -318,6 +298,32 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CustomerRewards",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CustomerId = table.Column<string>(type: "text", nullable: false),
+                    RewardId = table.Column<int>(type: "integer", nullable: false),
+                    VendorId = table.Column<int>(type: "integer", nullable: false),
+                    OutletId = table.Column<int>(type: "integer", nullable: true),
+                    ExternalId = table.Column<string>(type: "text", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RedeemedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerRewards", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CustomerRewards_Rewards_RewardId",
+                        column: x => x.RewardId,
+                        principalTable: "Rewards",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
@@ -487,10 +493,10 @@ namespace api.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "2375c89f-7857-4078-a96c-0bc616423c72", null, "User", "USER" },
-                    { "4c2dbfe7-4cc2-4dda-8bcb-8134d7b24eac", null, "SuperAdmin", "SUPERADMIN" },
-                    { "9cd12acf-5a09-4192-9c6b-66fc2b2c69f8", null, "Staff", "STAFF" },
-                    { "fa4accf7-6a8f-4369-867a-999419413419", null, "Admin", "ADMIN" }
+                    { "434d29a1-aa5b-4d9a-87b4-142a543bc6c3", null, "Admin", "ADMIN" },
+                    { "6a88fbbf-aa9b-4cc0-90d9-807a461eedce", null, "SuperAdmin", "SUPERADMIN" },
+                    { "ac5ae28a-c23e-42a3-be4e-0ac17336f8b9", null, "Staff", "STAFF" },
+                    { "fa17ae32-faf0-46fd-99ae-69f8b13f0884", null, "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -545,6 +551,11 @@ namespace api.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerRewards_RewardId",
+                table: "CustomerRewards",
+                column: "RewardId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Devices_VendorId",

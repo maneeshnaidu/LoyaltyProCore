@@ -12,7 +12,7 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250515034440_InitialCreate")]
+    [Migration("20250523125009_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -53,25 +53,25 @@ namespace api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4c2dbfe7-4cc2-4dda-8bcb-8134d7b24eac",
+                            Id = "6a88fbbf-aa9b-4cc0-90d9-807a461eedce",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
-                            Id = "fa4accf7-6a8f-4369-867a-999419413419",
+                            Id = "434d29a1-aa5b-4d9a-87b4-142a543bc6c3",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "9cd12acf-5a09-4192-9c6b-66fc2b2c69f8",
+                            Id = "ac5ae28a-c23e-42a3-be4e-0ac17336f8b9",
                             Name = "Staff",
                             NormalizedName = "STAFF"
                         },
                         new
                         {
-                            Id = "2375c89f-7857-4078-a96c-0bc616423c72",
+                            Id = "fa17ae32-faf0-46fd-99ae-69f8b13f0884",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -309,6 +309,8 @@ namespace api.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RewardId");
 
                     b.ToTable("CustomerRewards");
                 });
@@ -841,6 +843,17 @@ namespace api.Migrations
                     b.Navigation("Outlet");
 
                     b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("api.Models.CustomerRewards", b =>
+                {
+                    b.HasOne("api.Models.Reward", "Reward")
+                        .WithMany()
+                        .HasForeignKey("RewardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reward");
                 });
 
             modelBuilder.Entity("api.Models.Device", b =>
