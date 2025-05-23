@@ -143,7 +143,15 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
 });
 
-
+// Add CORS for vercel frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVercel",
+        policy => policy
+            .WithOrigins("https://loyaltyprocore-admin.vercel.app/") // Replace with your actual Vercel domain
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 
 var app = builder.Build();
@@ -174,6 +182,9 @@ app.UseCors(x => x
      .AllowCredentials()
       //   .WithOrigins("http://localhost:3000")
       .SetIsOriginAllowed(origin => true));
+
+// Use the CORS policy
+app.UseCors("AllowVercel");
 
 // Add Authentication & Authorization
 app.UseAuthentication();
