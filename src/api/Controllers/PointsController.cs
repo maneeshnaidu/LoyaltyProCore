@@ -41,7 +41,7 @@ namespace api.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetUserPoints(QueryObject query)
+        public async Task<IActionResult> GetUserPoints([FromBody] QueryObject query)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
