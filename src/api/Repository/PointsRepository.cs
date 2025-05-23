@@ -83,7 +83,7 @@ namespace api.Repository
 
         public async Task<List<RewardPoints>> GetUserPoints(ApplicationUser user)
         {
-            if (user != null && user.StampCard != null && user.StampCard.Count > 0)
+            if (user != null)
             {
                 var points = _context.RewardPoints
                 .Include(p => p.Reward)
