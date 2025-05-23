@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using api.Dtos.RewardPoints;
 using api.Extensions;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -40,10 +41,19 @@ namespace api.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetUserPoints()
+        public async Task<IActionResult> GetUserPoints(QueryObject query)
         {
-            var username = User.GetUsername();
-            var appUser = await _userManager.FindByNameAsync(username);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (query.UserCode == null)
+            {
+                return BadRequest("User code is required");
+            }
+
+            var appUser = await _userService.GetUserByUserCodeAsync(query.UserCode.Value);
+            // var username = User.GetUsername();
+            // var appUser = await _userManager.FindByNameAsync(username);
             if (appUser == null) return BadRequest("User not found");
             var userPoints = await _pointsRepository.GetUserPoints(appUser);
 
