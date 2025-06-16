@@ -31,7 +31,10 @@ jobs:
           ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
 
       - name: Install Render CLI
-        run: npm install -g @renderinc/cli
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install -g render-cli
 
       - name: Deploy to Render
         run: |
