@@ -48,8 +48,9 @@ namespace api.Controllers
             return Ok(rewardDto);
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet]
         [Authorize]
+        [Route("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -90,12 +91,7 @@ namespace api.Controllers
 
             var rewardModel = await _rewardRepository.UpdateAsync(id, updateDto);
 
-            if (rewardModel == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(rewardModel.ToRewardDto());
+            return rewardModel == null ? NotFound() : Ok(rewardModel.ToRewardDto());
         }
 
         [HttpDelete]
