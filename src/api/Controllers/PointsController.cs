@@ -118,9 +118,9 @@ namespace api.Controllers
             return updatedPoint == null ? StatusCode(500, "Points not updated") : (IActionResult)Created();
         }
 
-        [HttpPost("redeem")]
+        [HttpPost(Name = "redeem")]
         [Authorize]
-        [Route("{customerCode:int}")]
+        [Route("redeem/{customerCode:int}")]
         public async Task<IActionResult> RedeemPoints([FromRoute] int customerCode, [FromBody] UpsertPointsDto pointsDto)
         {
             if (!ModelState.IsValid)
