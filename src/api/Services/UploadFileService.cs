@@ -66,7 +66,9 @@ namespace api.Services
                 return new DeletionFileResult
                 {
                     Success = result.Result == "ok",
-                    Message = result.Result == "ok" ? "File deleted successfully" : result.Error?.Message
+                    Message = result.Result == "ok"
+                    ? "File deleted successfully"
+                    : result.Error?.Message ?? "Unknown error"
                 };
             }
             catch (Exception ex)

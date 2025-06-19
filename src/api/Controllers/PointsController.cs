@@ -88,6 +88,8 @@ namespace api.Controllers
                 return BadRequest(ModelState);
 
             var username = User.GetUsername();
+            if (string.IsNullOrEmpty(username))
+                return Unauthorized("User is not authenticated.");
             var appUser = await _userManager.FindByNameAsync(username);
             var customer = await _userService.GetUserByUserCodeAsync(customerCode);
             if (customer != null)
@@ -118,7 +120,7 @@ namespace api.Controllers
             return updatedPoint == null ? StatusCode(500, "Points not updated") : (IActionResult)Created();
         }
 
-        [HttpPost(Name = "redeem")]
+        [HttpPost("redeem")]
         [Authorize]
         [Route("redeem/{customerCode:int}")]
         public async Task<IActionResult> RedeemPoints([FromRoute] int customerCode, [FromBody] UpsertPointsDto pointsDto)
@@ -127,6 +129,8 @@ namespace api.Controllers
                 return BadRequest(ModelState);
 
             var username = User.GetUsername();
+            if (string.IsNullOrEmpty(username))
+                return Unauthorized("User is not authenticated.");
             var appUser = await _userManager.FindByNameAsync(username);
             var customer = await _userService.GetUserByUserCodeAsync(customerCode);
             if (customer != null)

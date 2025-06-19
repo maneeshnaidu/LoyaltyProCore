@@ -29,8 +29,8 @@ namespace api.Mappers
                 Name = vendorRequestDto.Name,
                 Description = vendorRequestDto.Description,
                 Category = vendorRequestDto.Category,
-                CoverImageUrl = vendorRequestDto.CoverImageUrl,
-                LogoImageUrl = vendorRequestDto.LogoImageUrl,
+                CoverImageUrl = vendorRequestDto.CoverImageUrl ?? string.Empty,
+                LogoImageUrl = vendorRequestDto.LogoImageUrl ?? string.Empty,
                 IsActive = true
             };
         }
