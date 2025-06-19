@@ -120,35 +120,35 @@ namespace api.Controllers
             return updatedPoint == null ? StatusCode(500, "Points not updated") : (IActionResult)Created();
         }
 
-        [HttpPost("redeem")]
-        [Authorize]
-        [Route("redeem/{customerCode:int}")]
-        public async Task<IActionResult> RedeemPoints([FromRoute] int customerCode, [FromBody] UpsertPointsDto pointsDto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        // [HttpPost("redeem")]
+        // [Authorize]
+        // [Route("redeem/{customerCode:int}")]
+        // public async Task<IActionResult> RedeemPoints([FromRoute] int customerCode, [FromBody] UpsertPointsDto pointsDto)
+        // {
+        //     if (!ModelState.IsValid)
+        //         return BadRequest(ModelState);
 
-            var username = User.GetUsername();
-            if (string.IsNullOrEmpty(username))
-                return Unauthorized("User is not authenticated.");
-            var appUser = await _userManager.FindByNameAsync(username);
-            var customer = await _userService.GetUserByUserCodeAsync(customerCode);
-            if (customer != null)
-            {
-                pointsDto.CustomerId = customer.Id;
-            }
+        //     var username = User.GetUsername();
+        //     if (string.IsNullOrEmpty(username))
+        //         return Unauthorized("User is not authenticated.");
+        //     var appUser = await _userManager.FindByNameAsync(username);
+        //     var customer = await _userService.GetUserByUserCodeAsync(customerCode);
+        //     if (customer != null)
+        //     {
+        //         pointsDto.CustomerId = customer.Id;
+        //     }
 
-            if (appUser != null)
-            {
-                pointsDto.StaffId = appUser.Id;
-            }
-            var reward = await _rewardRepository.GetByIdAsync(pointsDto.RewardId);
-            if (appUser == null || customer == null) return BadRequest("User not found");
-            if (reward == null) return BadRequest("Reward not found");
+        //     if (appUser != null)
+        //     {
+        //         pointsDto.StaffId = appUser.Id;
+        //     }
+        //     var reward = await _rewardRepository.GetByIdAsync(pointsDto.RewardId);
+        //     if (appUser == null || customer == null) return BadRequest("User not found");
+        //     if (reward == null) return BadRequest("Reward not found");
 
-            var model = await _pointsRepository.RedeemPointsAsync(customerCode, pointsDto);
+        //     var model = await _pointsRepository.RedeemPointsAsync(customerCode, pointsDto);
 
-            return model == null ? StatusCode(500, "Points not redeemed!") : (IActionResult)Created();
-        }
+        //     return model == null ? StatusCode(500, "Points not redeemed!") : (IActionResult)Created();
+        // }
     }
 }
