@@ -49,6 +49,7 @@ namespace api.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -59,8 +60,9 @@ namespace api.Controllers
             return reward == null ? NotFound() : Ok(reward.ToRewardDto());
         }
 
-        [HttpPost("{vendorId:int}")]
+        [HttpPost]
         [Authorize]
+        [Route("{vendorId:int}")]
         public async Task<IActionResult> Create([FromRoute] int vendorId, CreateRewardDto rewardDto)
         {
             if (!ModelState.IsValid)
@@ -109,8 +111,9 @@ namespace api.Controllers
             return rewardModel == null ? NotFound() : NoContent();
         }
 
-        [HttpGet("redeemable/{outletId:int}/{customerCode:int}")]
+        [HttpGet("get-redeemable-rewards")]
         [Authorize]
+        [Route("{outletId:int}/{customerCode:int}")]
         public async Task<IActionResult> GetRedeemableRewards([FromRoute] int outletId, [FromRoute] int customerCode)
         {
             if (!ModelState.IsValid)
