@@ -35,6 +35,7 @@ namespace api.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if (!ModelState.IsValid)
@@ -55,15 +56,10 @@ namespace api.Controllers
 
             var reward = await _rewardRepository.GetByIdAsync(id);
 
-            if (reward == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(reward.ToRewardDto());
+            return reward == null ? NotFound() : Ok(reward.ToRewardDto());
         }
 
-        [HttpPost("{vendorId}")]
+        [HttpPost("{vendorId:int}")]
         [Authorize]
         public async Task<IActionResult> Create([FromRoute] int vendorId, CreateRewardDto rewardDto)
         {
@@ -110,12 +106,23 @@ namespace api.Controllers
 
             var rewardModel = await _rewardRepository.DeleteAsync(id);
 
-            if (rewardModel == null)
-            {
-                return NotFound();
-            }
+            return rewardModel == null ? NotFound() : NoContent();
+        }
 
-            return NoContent();
+        [HttpGet("redeemable/{outletId:int}/{customerCode:int}")]
+        [Authorize]
+        public async Task<IActionResult> GetRedeemableRewards([FromRoute] int outletId, [FromRoute] int customerCode)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var rewards = await _rewardRepository.GetRedeemableRewardsAsync(outletId, customerCode);
+
+            if (rewards == null || !rewards.Any())
+                return NotFound();
+
+            var rewardDtos = rewards.Select(r => r.ToRewardDto()).ToList();
+            return Ok(rewardDtos);
         }
     }
 }

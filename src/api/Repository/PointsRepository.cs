@@ -54,6 +54,7 @@ namespace api.Repository
                 // Add customer rewards based on points
                 if (model.Points >= reward.PointsRequired)
                 {
+                    model.Points -= reward.PointsRequired;
                     await _rewardRepository.AddRewardAsync(model);
                 }
             }
@@ -144,16 +145,16 @@ namespace api.Repository
             await _transactionsRepository.CreateAsync(transaction);
 
             // Check and update the RewardsRepository
-            var reward = await _rewardRepository.GetByIdAsync(existingPoints.RewardId);
-            if (reward != null)
-            {
-                // Add customer rewards based on points
-                if (existingPoints.Points >= reward.PointsRequired)
-                {
-                    existingPoints.Points -= reward.PointsRequired;
-                    await _rewardRepository.AddRewardAsync(existingPoints);
-                }
-            }
+            // var reward = await _rewardRepository.GetByIdAsync(existingPoints.RewardId);
+            // if (reward != null)
+            // {
+            //     // Add customer rewards based on points
+            //     if (existingPoints.Points >= reward.PointsRequired)
+            //     {
+            //         existingPoints.Points -= reward.PointsRequired;
+            //         await _rewardRepository.AddRewardAsync(existingPoints);
+            //     }
+            // }
             await _context.SaveChangesAsync();
             return existingPoints;
         }
@@ -172,6 +173,49 @@ namespace api.Repository
             }
 
             return [];
+        }
+
+        public async Task<RewardPoints?> RedeemPointsAsync(int customerCode, UpsertPointsDto pointsDto)
+        {
+            var existingPoints = await _context.RewardPoints
+                .FirstOrDefaultAsync(r => r.CustomerId == pointsDto.CustomerId && r.VendorId == pointsDto.VendorId);
+            if (existingPoints == null)
+            {
+                return null; // No points found for the given customer and vendor
+            }
+
+            var reward = await _rewardRepository.GetByIdAsync(pointsDto.RewardId);
+            if (reward == null)
+            {
+                return null; // Reward not found
+            }
+
+            // Check if the user has enough points to redeem the reward
+            if (existingPoints.Points >= reward.PointsRequired)
+            {
+                return null; // Not enough points
+            }
+
+            // Deduct the points and update the database
+            existingPoints.Points -= reward.PointsRequired;
+            existingPoints.LastUpdatedOn = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            // Add a record to the PointsTransaction table
+            var transaction = new PointsTransaction
+            {
+                CustomerId = pointsDto.CustomerId,
+                Customer = await _userService.GetUsernameByIdAsync(pointsDto.CustomerId) ?? string.Empty,
+                StaffId = pointsDto.StaffId,
+                AddedBy = await _userService.GetUsernameByIdAsync(pointsDto.StaffId) ?? string.Empty,
+                OrderId = pointsDto.OrderId,
+                Points = pointsDto.Point,
+                TransactionType = "RedeemedPoints", // Example transaction type
+                OutletId = pointsDto.OutletId
+            };
+            await _transactionsRepository.CreateAsync(transaction);
+
+            return existingPoints;
         }
     }
 }

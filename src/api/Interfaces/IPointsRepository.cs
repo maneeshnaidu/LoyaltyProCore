@@ -19,6 +19,7 @@ namespace api.Interfaces
         Task<RewardPoints?> GetUserPointsByReward(string customerId, int rewardId);
         Task<RewardPoints> CreateAsync(RewardPoints pointsModel);
         Task<RewardPoints?> UpdateAsync(UpsertPointsDto pointsDto);
+        Task<RewardPoints?> RedeemPointsAsync(int customerCode, UpsertPointsDto pointsDto);
         Task<RewardPoints?> DeleteAsync(int id);
         Task<bool> PointsExists(int id);
     }

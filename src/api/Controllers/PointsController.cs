@@ -118,22 +118,33 @@ namespace api.Controllers
             return updatedPoint == null ? StatusCode(500, "Points not updated") : (IActionResult)Created();
         }
 
-        [HttpDelete]
+        [HttpPost("redeem")]
         [Authorize]
-        [Route("{rewardId:int}")]
-        public async Task<IActionResult> RedeemReward([FromRoute] int rewardId)
+        [Route("{customerCode:int}")]
+        public async Task<IActionResult> RedeemPoints([FromRoute] int customerCode, [FromBody] UpsertPointsDto pointsDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var model = await _rewardRepository.RedeemRewardAsync(rewardId);
-
-            if (model == null)
+            var username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(username);
+            var customer = await _userService.GetUserByUserCodeAsync(customerCode);
+            if (customer != null)
             {
-                return NotFound("No rewards available for user.");
+                pointsDto.CustomerId = customer.Id;
             }
 
-            return NoContent();
+            if (appUser != null)
+            {
+                pointsDto.StaffId = appUser.Id;
+            }
+            var reward = await _rewardRepository.GetByIdAsync(pointsDto.RewardId);
+            if (appUser == null || customer == null) return BadRequest("User not found");
+            if (reward == null) return BadRequest("Reward not found");
+
+            var model = await _pointsRepository.RedeemPointsAsync(customerCode, pointsDto);
+
+            return model == null ? StatusCode(500, "Points not redeemed!") : (IActionResult)Created();
         }
     }
 }

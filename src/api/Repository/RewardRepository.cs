@@ -12,6 +12,7 @@ namespace api.Repository
     {
         private readonly ApplicationDBContext _context;
         private readonly IUserService _userService;
+
         public RewardRepository(ApplicationDBContext context, IUserService userService)
         {
             _context = context;
@@ -117,18 +118,32 @@ namespace api.Repository
             return reward;
         }
 
-        public async Task<CustomerRewards?> RedeemRewardAsync(int rewardId)
+        public async Task<List<Reward>?> GetRedeemableRewardsAsync(int outletId, int customerCode)
         {
-            var model = await _context.CustomerRewards.FirstOrDefaultAsync(x => x.Id == rewardId);
-            if (model == null)
+            var user = await _userService.GetUserByUserCodeAsync(customerCode);
+            if (user == null)
             {
                 return null;
             }
 
-            _context.CustomerRewards.Remove(model);
-            await _context.SaveChangesAsync();
-            return model;
+            var userPoints = await _context.RewardPoints
+                .FirstOrDefaultAsync(p => p.CustomerId == user.Id);
+            if (userPoints == null)
+            {
+                return null; // User points not found
+            }
 
+            var outlet = await _context.Outlets.FirstOrDefaultAsync(o => o.Id == outletId);
+            if (outlet == null)
+            {
+                return null; // Outlet not found
+            }
+
+            var rewards = await _context.Rewards
+                .Where(r => r.VendorId == outlet.VendorId && r.PointsRequired <= userPoints.Points && r.IsActive)
+                .ToListAsync();
+
+            return rewards.Count == 0 ? null : rewards;
         }
     }
 }
