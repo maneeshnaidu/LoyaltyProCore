@@ -9,6 +9,7 @@ using api.Helpers;
 using api.Interfaces;
 using api.Models;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Repository
@@ -18,13 +19,15 @@ namespace api.Repository
         private readonly ApplicationDBContext _context;
         private readonly IOutletRepository _outletRepository;
         private readonly IUserService _userService;
+        private readonly UserManager<ApplicationUser> _userManager;
         public TransactionRepository(ApplicationDBContext context, IUserService userService,
-            IOutletRepository outletRepository
+            IOutletRepository outletRepository, UserManager<ApplicationUser> userManager
         )
         {
             _context = context;
             _outletRepository = outletRepository;
             _userService = userService;
+            _userManager = userManager;
         }
         public async Task<PointsTransaction> CreateAsync(PointsTransaction transaction)
         {
@@ -68,9 +71,19 @@ namespace api.Repository
             if (query.UserCode != null)
             {
                 var user = await _userService.GetUserByUserCodeAsync(query.UserCode.Value);
+
                 if (user != null)
                 {
-                    transactions = transactions.Where(t => t.CustomerId == user.Id);
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles.Contains("Staff") || roles.Contains("Admin"))
+                    {
+                        transactions = transactions.Where(t => t.StaffId == user.Id);
+                    }
+                    else if (roles.Contains("Customer"))
+                    {
+                        // Assuming CustomerId is the same as User Id for Customers
+                        transactions = transactions.Where(t => t.CustomerId == user.Id);
+                    }
                 }
             }
 
