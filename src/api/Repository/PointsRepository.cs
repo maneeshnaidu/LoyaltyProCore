@@ -191,7 +191,7 @@ namespace api.Repository
             }
 
             // Check if the user has enough points to redeem the reward
-            if (existingPoints.Points >= reward.PointsRequired)
+            if (existingPoints.Points < reward.PointsRequired)
             {
                 return null; // Not enough points
             }
@@ -209,7 +209,7 @@ namespace api.Repository
                 StaffId = pointsDto.StaffId,
                 AddedBy = await _userService.GetUsernameByIdAsync(pointsDto.StaffId) ?? string.Empty,
                 OrderId = pointsDto.OrderId,
-                Points = pointsDto.Point,
+                Points = reward.PointsRequired,
                 TransactionType = "RedeemedPoints", // Example transaction type
                 OutletId = pointsDto.OutletId
             };

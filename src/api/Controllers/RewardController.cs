@@ -107,9 +107,9 @@ namespace api.Controllers
             return rewardModel == null ? NotFound() : NoContent();
         }
 
-        [HttpGet("get-redeemable-rewards")]
+        [HttpGet]
         [Authorize]
-        [Route("{outletId:int}/{customerCode:int}")]
+        [Route("get-rewards/{outletId:int}/{customerCode:int}")]
         public async Task<IActionResult> GetRedeemableRewards([FromRoute] int outletId, [FromRoute] int customerCode)
         {
             if (!ModelState.IsValid)
@@ -117,7 +117,7 @@ namespace api.Controllers
 
             var rewards = await _rewardRepository.GetRedeemableRewardsAsync(outletId, customerCode);
 
-            if (rewards == null || !rewards.Any())
+            if (rewards == null || rewards.Count == 0)
                 return NotFound();
 
             var rewardDtos = rewards.Select(r => r.ToRewardDto()).ToList();
