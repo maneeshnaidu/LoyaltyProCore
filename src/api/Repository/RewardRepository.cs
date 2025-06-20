@@ -5,6 +5,7 @@ using api.Interfaces;
 using api.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace api.Repository
 {
@@ -139,11 +140,28 @@ namespace api.Repository
                 return null; // Outlet not found
             }
 
-            var rewards = await _context.Rewards
+            if (outletId != outlet.VendorId)
+            {
+                var vendor = await _context.Vendors.FirstOrDefaultAsync(v => v.Id == outlet.VendorId);
+                if (vendor == null)
+                {
+                    return null; // Vendor not found
+                }
+
+                var rewards = await _context.Rewards
+                .Where(r => r.VendorId == outletId && r.PointsRequired <= userPoints.Points && r.IsActive)
+                .ToListAsync();
+
+                return rewards.Count == 0 ? null : rewards;
+            }
+            else
+            {
+                var rewards = await _context.Rewards
                 .Where(r => r.VendorId == outlet.VendorId && r.PointsRequired <= userPoints.Points && r.IsActive)
                 .ToListAsync();
 
-            return rewards.Count == 0 ? null : rewards;
+                return rewards.Count == 0 ? null : rewards;
+            }
         }
     }
 }
