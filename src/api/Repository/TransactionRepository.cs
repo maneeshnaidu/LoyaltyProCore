@@ -90,6 +90,7 @@ namespace api.Repository
             var skipNumber = (query.PageNumber - 1) * query.PageSize;
             return await transactions
                 .Skip(skipNumber)
+                .OrderByDescending(t => t.CreatedOn) // Order by CreatedOn descending
                 .Take(query.PageSize)
                 .ToListAsync();
         }
