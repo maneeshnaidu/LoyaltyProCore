@@ -87,7 +87,6 @@ namespace api.Repository
             if (user != null)
             {
                 var points = _context.RewardPoints
-                .Include(p => p.Reward)
                 .Include(p => p.Vendor)
                 .Where(p => p.CustomerId == user.Id);
 
