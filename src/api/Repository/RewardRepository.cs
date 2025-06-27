@@ -51,9 +51,12 @@ namespace api.Repository
                 var user = await _userService.GetUserByUserCodeAsync(query.UserCode.Value);
                 if (user != null)
                 {
-                    var customerRewards = _context.CustomerRewards.Where(r => r.CustomerId == user.Id);
-                    var rewardIds = customerRewards.Select(cr => cr.RewardId); // Get the reward IDs
-                    rewards = rewards.Where(r => rewardIds.Contains(r.Id)); // Filter rewards based on the reward IDs
+                    var userPoints = await _context.RewardPoints
+                        .FirstOrDefaultAsync(p => p.CustomerId == user.Id);
+                    if (userPoints != null)
+                    {
+                        rewards = rewards.Where(r => r.PointsRequired <= userPoints.Points && r.IsActive);
+                    }
                 }
             }
 
